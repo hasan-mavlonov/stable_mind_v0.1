@@ -3,16 +3,12 @@ from __future__ import annotations
 
 import os
 
-from dotenv import load_dotenv
-
-
-load_dotenv()
 import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from openai import OpenAI
+import importlib
 
 
 @dataclass
@@ -37,7 +33,8 @@ class PerceptionEngine:
     def __init__(self, root_dir: str, model: str = "gpt-4.1"):
         self.root = Path(root_dir)
         self.model = model
-        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        openai_module = importlib.import_module("openai")
+        self.client = openai_module.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
         self.ontology = self._read_json(self.root / "config" / "ontology.json")
         self.mem_path = self.root / "memory" / "perceptions.jsonl"
@@ -190,17 +187,30 @@ class PerceptionEngine:
         """
         Extract tool call arguments from Responses API.
         """
+        def _parse_args(raw_args: Any) -> Dict[str, Any]:
+            if isinstance(raw_args, dict):
+                return raw_args
+            if isinstance(raw_args, str):
+                try:
+                    return json.loads(raw_args)
+                except Exception:
+                    return {"entities": []}
+            return {"entities": []}
+
         for item in getattr(response, "output", []) or []:
-            # New API structure
+            item_type = getattr(item, "type", None)
+
+            # Most common Responses API structure for tools
+            if item_type in {"function_call", "tool_call"}:
+                if getattr(item, "name", None) == self.TOOL_NAME:
+                    return _parse_args(getattr(item, "arguments", "{}"))
+
+            # Some SDK versions nest tool calls under item.content
             content = getattr(item, "content", []) or []
             for c in content:
-                if getattr(c, "type", None) == "tool_call":
+                if getattr(c, "type", None) in {"function_call", "tool_call"}:
                     if getattr(c, "name", None) == self.TOOL_NAME:
-                        raw_args = getattr(c, "arguments", "{}")
-                        try:
-                            return json.loads(raw_args)
-                        except Exception:
-                            return {"entities": []}
+                        return _parse_args(getattr(c, "arguments", "{}"))
 
         # Fallback: maybe model responded as plain text JSON
         try:
