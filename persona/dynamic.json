@@ -1,9 +1,44 @@
 {
-  "favorite_spot": null,
-  "recent_hobbies": [],
-  "current_focus": [],
-  "recent_dislikes": [],
-  "recent_discoveries": [],
-  "last_visited_places": [],
-  "last_entity_focus": null
+  "now": {
+    "mood": {
+      "joy": 0.5,
+      "trust": 0.5,
+      "fear": 0.5,
+      "surprise": 0.5,
+      "sadness": 0.5,
+      "disgust": 0.5,
+      "anger": 0.5,
+      "anticipation": 0.5
+    },
+    "last_updated_turn": 0,
+    "arousal": 0.5,
+    "stress": 0.5,
+    "energy": 0.5,
+    "confidence": 0.5,
+    "current_topic": null,
+    "current_activity": null
+  },
+  "working_memory": {
+    "last_entity_focus": null,
+    "last_person_entity": null,
+    "last_place_entity": null,
+    "recent_entities": [],
+    "recent_events": [],
+    "open_threads": [],
+    "perception_buffer": []
+  },
+  "short_term_preferences": {
+    "recent_likes": [],
+    "recent_dislikes": [],
+    "recent_discoveries": [],
+    "recent_hobbies": []
+  },
+  "biases": {
+    "negativity_bias": 0.0,
+    "social_guard": 0.0,
+    "novelty_seeking": 0.0
+  },
+  "last_person_entity": "mother",
+  "last_place_entity": "cafe",
+  "last_entity_focus": "Success"
 }

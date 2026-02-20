@@ -2,7 +2,7 @@ from core.agent import Agent
 import json
 import random
 
-a = Agent(root_dir=".", model="gpt-4.1")
+a = Agent(root_dir=".", model="gpt-4.1-mini")
 
 test_inputs = [
     # place reinforcement

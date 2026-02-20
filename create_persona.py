@@ -12,7 +12,6 @@ import json
 from pathlib import Path
 from typing import Dict, Any
 
-
 EMOTIONS_8 = [
     "joy", "trust", "fear", "surprise",
     "sadness", "disgust", "anger", "anticipation"
@@ -37,7 +36,6 @@ def main() -> None:
     # -------------------------------
     # 1️⃣ Immutable
     # -------------------------------
-
     immutable = {
         "id": "rin",
         "display_name": "Rin",
@@ -57,7 +55,6 @@ def main() -> None:
     # -------------------------------
     # 2️⃣ Stable Identity
     # -------------------------------
-
     stable = {
         "personality": {
             "mbti": "INFJ",
@@ -71,30 +68,57 @@ def main() -> None:
             ],
             "tone_of_voice": "Warm, introspective, occasionally poetic"
         },
+        # Canonical belief namespaces (no plural keys)
         "beliefs": {
-            "places": {},
-            "people": {}
+            "place": {},
+            "person": {},
+            "concept": {},
+            "activity": {},
+            "organization": {},
+            "self_state": {}
         }
     }
 
     # -------------------------------
-    # 3️⃣ Dynamic State
+    # 3️⃣ Dynamic State (current / session-level)
     # -------------------------------
-
     dynamic = {
-        "favorite_spot": None,
-        "recent_hobbies": [],
-        "current_focus": [],
-        "recent_dislikes": [],
-        "recent_discoveries": [],
-        "last_visited_places": [],
-        "last_entity_focus": None
+        "now": {
+            "mood": {e: 0.5 for e in EMOTIONS_8},
+            "last_updated_turn": 0,
+            "arousal": 0.5,
+            "stress": 0.5,
+            "energy": 0.5,
+            "confidence": 0.5,
+            "current_topic": None,
+            "current_activity": None
+        },
+        "working_memory": {
+            "last_entity_focus": None,
+            "last_person_entity": None,
+            "last_place_entity": None,
+            "recent_entities": [],
+            "recent_events": [],
+            "open_threads": [],
+            # Buffer perceptions until rumination (Option A)
+            "perception_buffer": []
+        },
+        "short_term_preferences": {
+            "recent_likes": [],
+            "recent_dislikes": [],
+            "recent_discoveries": [],
+            "recent_hobbies": []
+        },
+        "biases": {
+            "negativity_bias": 0.0,
+            "social_guard": 0.0,
+            "novelty_seeking": 0.0
+        }
     }
 
     # -------------------------------
     # 4️⃣ Trait Baseline
     # -------------------------------
-
     baseline_traits = {
         "warmth": 0.6,
         "sarcasm": 0.1,
@@ -127,7 +151,6 @@ def main() -> None:
     # -------------------------------
     # Write files
     # -------------------------------
-
     write_json(persona_dir / "immutable.json", immutable)
     write_json(persona_dir / "stable.json", stable)
     write_json(persona_dir / "dynamic.json", dynamic)
