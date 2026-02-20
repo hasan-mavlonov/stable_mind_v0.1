@@ -7,7 +7,7 @@ from .consolidation import ConsolidationEngine
 
 
 class Agent:
-    def __init__(self, root_dir: str, model: str = "gpt-4.1"):
+    def __init__(self, root_dir: str, model: str = "gpt-4.1-mini"):
         self.root_dir = root_dir
         self.state = StateManager(root_dir)
 

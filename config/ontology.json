@@ -11,7 +11,6 @@
       "1.0": "strongly high on the dimension's 'high' direction"
     }
   },
-
   "entity_types": {
     "place": {
       "description": "Physical or virtual locations: cafes, parks, offices, cities, rooms.",
@@ -22,54 +21,113 @@
           "description": "How quiet vs noisy the place is.",
           "polarity_high": "quiet",
           "polarity_low": "noisy",
-          "examples_high": ["silent", "peaceful", "calm", "no sound"],
-          "examples_low": ["loud", "noisy", "chaotic", "blasting music"]
+          "examples_high": [
+            "silent",
+            "peaceful",
+            "calm",
+            "no sound"
+          ],
+          "examples_low": [
+            "loud",
+            "noisy",
+            "chaotic",
+            "blasting music"
+          ]
         },
         "brightness": {
           "description": "How bright vs dim the place feels.",
           "polarity_high": "bright",
           "polarity_low": "dim",
-          "examples_high": ["sunlit", "bright", "well-lit"],
-          "examples_low": ["dark", "dim", "gloomy"]
+          "examples_high": [
+            "sunlit",
+            "bright",
+            "well-lit"
+          ],
+          "examples_low": [
+            "dark",
+            "dim",
+            "gloomy"
+          ]
         },
         "crowdedness": {
           "description": "How crowded vs empty the place is.",
           "polarity_high": "crowded",
           "polarity_low": "empty",
-          "examples_high": ["packed", "busy", "full of people"],
-          "examples_low": ["empty", "quiet inside", "no one there"]
+          "examples_high": [
+            "packed",
+            "busy",
+            "full of people"
+          ],
+          "examples_low": [
+            "empty",
+            "quiet inside",
+            "no one there"
+          ]
         },
         "comfort": {
           "description": "Physical comfort: seating, temperature, space, ergonomics.",
           "polarity_high": "comfortable",
           "polarity_low": "uncomfortable",
-          "examples_high": ["cozy chairs", "comfortable", "relaxing"],
-          "examples_low": ["stuffy", "cramped", "uncomfortable seats"]
+          "examples_high": [
+            "cozy chairs",
+            "comfortable",
+            "relaxing"
+          ],
+          "examples_low": [
+            "stuffy",
+            "cramped",
+            "uncomfortable seats"
+          ]
         },
         "aesthetic": {
           "description": "Visual appeal / beauty of the place.",
           "polarity_high": "beautiful",
           "polarity_low": "ugly",
-          "examples_high": ["beautiful", "stunning", "aesthetic", "pretty"],
-          "examples_low": ["ugly", "messy", "bad-looking"]
+          "examples_high": [
+            "beautiful",
+            "stunning",
+            "aesthetic",
+            "pretty"
+          ],
+          "examples_low": [
+            "ugly",
+            "messy",
+            "bad-looking"
+          ]
         },
         "cleanliness": {
           "description": "How clean vs dirty the place seems.",
           "polarity_high": "clean",
           "polarity_low": "dirty",
-          "examples_high": ["spotless", "clean", "fresh"],
-          "examples_low": ["dirty", "sticky", "trash everywhere"]
+          "examples_high": [
+            "spotless",
+            "clean",
+            "fresh"
+          ],
+          "examples_low": [
+            "dirty",
+            "sticky",
+            "trash everywhere"
+          ]
         },
         "service_quality": {
           "description": "Service experience (if described): helpfulness, speed, attitude.",
           "polarity_high": "good service",
           "polarity_low": "bad service",
-          "examples_high": ["friendly staff", "quick service", "helpful"],
-          "examples_low": ["rude", "slow", "ignored", "unhelpful"]
+          "examples_high": [
+            "friendly staff",
+            "quick service",
+            "helpful"
+          ],
+          "examples_low": [
+            "rude",
+            "slow",
+            "ignored",
+            "unhelpful"
+          ]
         }
       }
     },
-
     "person": {
       "description": "Individual people or groups referred to as a person-like agent.",
       "default_mean": 0.0,
@@ -79,40 +137,85 @@
           "description": "How honest/reliable vs deceitful/unreliable the person is.",
           "polarity_high": "trustworthy",
           "polarity_low": "untrustworthy",
-          "examples_high": ["honest", "kept promise", "reliable"],
-          "examples_low": ["lied", "betrayed", "manipulative"]
+          "examples_high": [
+            "honest",
+            "kept promise",
+            "reliable"
+          ],
+          "examples_low": [
+            "lied",
+            "betrayed",
+            "manipulative"
+          ]
         },
         "warmth": {
           "description": "How kind/caring vs cold/hostile the person is.",
           "polarity_high": "warm",
           "polarity_low": "cold",
-          "examples_high": ["kind", "supportive", "caring"],
-          "examples_low": ["mean", "cold", "hostile"]
+          "examples_high": [
+            "supportive",
+            "kind",
+            "caring",
+            "gentle"
+          ],
+          "examples_low": [
+            "cold",
+            "mean",
+            "harsh"
+          ]
         },
         "dominance": {
           "description": "How dominant/assertive vs submissive/passive the person is.",
           "polarity_high": "dominant",
           "polarity_low": "submissive",
-          "examples_high": ["bossy", "controlling", "assertive"],
-          "examples_low": ["shy", "passive", "submissive"]
+          "examples_high": [
+            "bossy",
+            "controlling",
+            "assertive"
+          ],
+          "examples_low": [
+            "shy",
+            "passive",
+            "submissive"
+          ]
         },
         "emotional_stability": {
           "description": "How calm/stable vs volatile/anxious the person is.",
           "polarity_high": "stable",
           "polarity_low": "volatile",
-          "examples_high": ["calm", "steady", "grounded"],
-          "examples_low": ["explosive", "unstable", "panicky"]
+          "examples_high": [
+            "calm",
+            "steady",
+            "grounded"
+          ],
+          "examples_low": [
+            "explosive",
+            "unstable",
+            "panicky",
+            "anxious",
+            "shouted",
+            "yelled",
+            "angry",
+            "lost control"
+          ]
         },
         "competence": {
           "description": "How capable/competent vs incompetent the person seems (if described).",
           "polarity_high": "competent",
           "polarity_low": "incompetent",
-          "examples_high": ["skilled", "smart", "good at it"],
-          "examples_low": ["clueless", "bad at it", "incompetent"]
+          "examples_high": [
+            "skilled",
+            "smart",
+            "good at it"
+          ],
+          "examples_low": [
+            "clueless",
+            "bad at it",
+            "incompetent"
+          ]
         }
       }
     },
-
     "activity": {
       "description": "Repeated behaviors: studying, coding, gym, journaling, content creation.",
       "default_mean": 0.0,
@@ -122,33 +225,61 @@
           "description": "How enjoyable vs unpleasant the activity feels.",
           "polarity_high": "enjoyable",
           "polarity_low": "unpleasant",
-          "examples_high": ["fun", "love doing it", "enjoyable"],
-          "examples_low": ["hate it", "boring", "dread it"]
+          "examples_high": [
+            "fun",
+            "love doing it",
+            "enjoyable"
+          ],
+          "examples_low": [
+            "hate it",
+            "boring",
+            "dread it"
+          ]
         },
         "effort_cost": {
           "description": "How effortful/exhausting vs easy/light it feels.",
           "polarity_high": "effortful",
           "polarity_low": "easy",
-          "examples_high": ["exhausting", "hard", "draining"],
-          "examples_low": ["easy", "light", "effortless"]
+          "examples_high": [
+            "exhausting",
+            "hard",
+            "draining"
+          ],
+          "examples_low": [
+            "easy",
+            "light",
+            "effortless"
+          ]
         },
         "meaningfulness": {
           "description": "How meaningful vs pointless it feels.",
           "polarity_high": "meaningful",
           "polarity_low": "pointless",
-          "examples_high": ["worth it", "meaningful", "important"],
-          "examples_low": ["pointless", "waste of time"]
+          "examples_high": [
+            "worth it",
+            "meaningful",
+            "important"
+          ],
+          "examples_low": [
+            "pointless",
+            "waste of time"
+          ]
         },
         "mastery": {
           "description": "Sense of competence/mastery in the activity (if described).",
           "polarity_high": "high mastery",
           "polarity_low": "low mastery",
-          "examples_high": ["I'm good at it", "I mastered it"],
-          "examples_low": ["I suck at it", "I'm bad at it"]
+          "examples_high": [
+            "I'm good at it",
+            "I mastered it"
+          ],
+          "examples_low": [
+            "I suck at it",
+            "I'm bad at it"
+          ]
         }
       }
     },
-
     "organization": {
       "description": "Companies, schools, teams, communities, institutions.",
       "default_mean": 0.0,
@@ -158,33 +289,60 @@
           "description": "Perceived prestige/status.",
           "polarity_high": "prestigious",
           "polarity_low": "low-status",
-          "examples_high": ["top-tier", "elite", "prestigious"],
-          "examples_low": ["unknown", "low-tier"]
+          "examples_high": [
+            "top-tier",
+            "elite",
+            "prestigious"
+          ],
+          "examples_low": [
+            "unknown",
+            "low-tier"
+          ]
         },
         "fairness": {
           "description": "How fair vs unfair the organization seems.",
           "polarity_high": "fair",
           "polarity_low": "unfair",
-          "examples_high": ["fair", "transparent", "merit-based"],
-          "examples_low": ["biased", "unfair", "corrupt"]
+          "examples_high": [
+            "fair",
+            "transparent",
+            "merit-based"
+          ],
+          "examples_low": [
+            "biased",
+            "unfair",
+            "corrupt"
+          ]
         },
         "competence": {
           "description": "Operational competence of the org.",
           "polarity_high": "competent",
           "polarity_low": "incompetent",
-          "examples_high": ["well-run", "organized"],
-          "examples_low": ["chaotic", "inept", "messy"]
+          "examples_high": [
+            "well-run",
+            "organized"
+          ],
+          "examples_low": [
+            "chaotic",
+            "inept",
+            "messy"
+          ]
         },
         "value_alignment": {
           "description": "How aligned it feels with the agent's values.",
           "polarity_high": "aligned",
           "polarity_low": "misaligned",
-          "examples_high": ["fits my values", "aligned"],
-          "examples_low": ["against my values", "misaligned"]
+          "examples_high": [
+            "fits my values",
+            "aligned"
+          ],
+          "examples_low": [
+            "against my values",
+            "misaligned"
+          ]
         }
       }
     },
-
     "concept": {
       "description": "Abstract ideas: success, love, AI, beauty, marriage, freedom.",
       "default_mean": 0.0,
@@ -194,26 +352,49 @@
           "description": "Overall positivity vs negativity toward the concept.",
           "polarity_high": "positive",
           "polarity_low": "negative",
-          "examples_high": ["good", "beautiful", "I like it"],
-          "examples_low": ["bad", "harmful", "I hate it"]
+          "examples_high": [
+            "good",
+            "beautiful",
+            "I like it"
+          ],
+          "examples_low": [
+            "overrated",
+            "bad",
+            "harmful",
+            "toxic"
+          ]
         },
         "importance": {
           "description": "How important vs unimportant the concept feels.",
           "polarity_high": "important",
           "polarity_low": "unimportant",
-          "examples_high": ["matters a lot", "important"],
-          "examples_low": ["doesn't matter", "irrelevant"]
+          "examples_high": [
+            "important",
+            "meaningful",
+            "matters",
+            "significant"
+          ],
+          "examples_low": [
+            "doesn't matter",
+            "irrelevant"
+          ]
         },
         "certainty": {
           "description": "How certain vs uncertain the agent feels about beliefs around it (if explicitly stated).",
           "polarity_high": "certain",
           "polarity_low": "uncertain",
-          "examples_high": ["I'm sure", "definitely"],
-          "examples_low": ["I'm not sure", "maybe", "uncertain"]
+          "examples_high": [
+            "I'm sure",
+            "definitely"
+          ],
+          "examples_low": [
+            "I'm not sure",
+            "maybe",
+            "uncertain"
+          ]
         }
       }
     },
-
     "self_state": {
       "description": "Beliefs about the self (not immutable identity facts).",
       "default_mean": 0.0,
@@ -223,22 +404,42 @@
           "description": "Self-confidence vs self-doubt.",
           "polarity_high": "confident",
           "polarity_low": "doubtful",
-          "examples_high": ["I can do this", "confident"],
-          "examples_low": ["I can't", "I doubt myself"]
+          "examples_high": [
+            "I can do this",
+            "confident"
+          ],
+          "examples_low": [
+            "I can't",
+            "I doubt myself"
+          ]
         },
         "stress": {
           "description": "Stress level if explicitly described.",
           "polarity_high": "stressed",
           "polarity_low": "relaxed",
-          "examples_high": ["stressed", "anxious", "overwhelmed"],
-          "examples_low": ["relaxed", "calm"]
+          "examples_high": [
+            "stressed",
+            "anxious",
+            "overwhelmed"
+          ],
+          "examples_low": [
+            "relaxed",
+            "calm"
+          ]
         },
         "energy": {
           "description": "Energy level if explicitly described.",
           "polarity_high": "energetic",
           "polarity_low": "tired",
-          "examples_high": ["energized", "full of energy"],
-          "examples_low": ["tired", "exhausted", "drained"]
+          "examples_high": [
+            "energized",
+            "full of energy"
+          ],
+          "examples_low": [
+            "tired",
+            "exhausted",
+            "drained"
+          ]
         }
       }
     }

@@ -1,5 +1,5 @@
 {
-  "current_turn": 0,
+  "current_turn": 1,
   "last_rumination_turn": 0,
   "rumination_window_size": 20,
   "turns_since_last_rumination": 0

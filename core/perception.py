@@ -162,40 +162,52 @@ class PerceptionEngine:
         return (
             "You are a perception extractor.\n"
             "Return JSON arguments for the function tool `extract_perceptions`.\n\n"
-            "Hard rules:\n"
-            "1) Only output entities whose `entity_type` exists in the ontology.\n"
-            "2) If you output an entity, you MUST output `dimension_values` with at least ONE dimension.\n"
-            "3) Only use dimension keys that exist for that `entity_type` in the ontology.\n"
-            "4) Only include a dimension if it is explicitly supported by the text.\n"
-            "5) Values must be within [-1, 1]. Use strong values (e.g. 0.6–1.0) only when strongly supported.\n"
-            "6) If nothing qualifies, return `entities: []`.\n\n"
-            "Example:\n"
-            "Text: 'The cafe was loud and crowded.'\n"
-            "Output entities: [{entity_type:'place', entity:'cafe', dimension_values:{quietness:-0.8, crowdedness:0.8}, confidence:0.8}]\n"
+
+            "Map text to the most appropriate dimension using semantic understanding.\n"
+            "Do not invent entities not mentioned in the text.\n\n"
+
+            "Mapping guidance:\n"
+            "- Noise/silence -> quietness.\n"
+            "- Number of people -> crowdedness.\n"
+            "- Light/dark -> brightness.\n"
+            "- Comfort/cozy/stuffy -> comfort.\n"
+            "- Beauty/ugliness -> aesthetic.\n"
+            "- Anxiety/yelling/calm (person) -> emotional_stability.\n"
+            "- Kindness/support -> warmth.\n"
+            "- Importance/meaning -> importance.\n"
+            "- Overrated/bad/good (concept) -> valence.\n\n"
+
+            "Hard constraints:\n"
+            "1) Only use entity types defined in ontology.\n"
+            "2) Only use dimensions defined for that entity type.\n"
+            "3) If entity is returned, at least one dimension must be present.\n"
+            "4) Use values in [-1, 1]. Strong wording -> larger magnitude.\n"
         )
 
     # ---------- parsing ----------
 
     def _extract_function_args(self, response: Any) -> Dict[str, Any]:
         """
-        Responses API returns tool calls in response.output.
-        We find the function_call with name == TOOL_NAME and parse JSON args.
+        Extract tool call arguments from Responses API.
         """
-        tool_calls = []
         for item in getattr(response, "output", []) or []:
-            if getattr(item, "type", None) == "function_call":
-                tool_calls.append(item)
+            # New API structure
+            content = getattr(item, "content", []) or []
+            for c in content:
+                if getattr(c, "type", None) == "tool_call":
+                    if getattr(c, "name", None) == self.TOOL_NAME:
+                        raw_args = getattr(c, "arguments", "{}")
+                        try:
+                            return json.loads(raw_args)
+                        except Exception:
+                            return {"entities": []}
 
-        for call in tool_calls:
-            if getattr(call, "name", None) == self.TOOL_NAME:
-                raw_args = getattr(call, "arguments", "{}")
-                try:
-                    return json.loads(raw_args)
-                except json.JSONDecodeError:
-                    raise RuntimeError(f"Tool returned non-JSON arguments: {raw_args}")
-
-        # If model didn't call the tool (shouldn't happen because we forced it)
-        raise RuntimeError("No function_call returned for extract_perceptions.")
+        # Fallback: maybe model responded as plain text JSON
+        try:
+            text = response.output_text
+            return json.loads(text)
+        except Exception:
+            return {"entities": []}
 
     def _normalize_entities(self, args: Dict[str, Any]) -> List[Dict[str, Any]]:
         """
