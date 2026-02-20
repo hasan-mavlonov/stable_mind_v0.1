@@ -144,7 +144,7 @@ def main() -> None:
     counters = {
         "current_turn": 0,
         "last_rumination_turn": 0,
-        "rumination_window_size": 20,
+        "rumination_window_size": 5,
         "turns_since_last_rumination": 0
     }
 
