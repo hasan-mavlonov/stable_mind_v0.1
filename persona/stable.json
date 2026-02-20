@@ -12,86 +12,9 @@
     "tone_of_voice": "Warm, introspective, occasionally poetic"
   },
   "beliefs": {
-    "place": {
-      "park": {
-        "quietness": {
-          "mean": 0.136798095703125,
-          "confidence": 0.5225,
-          "n": 7,
-          "last_updated_turn": 8
-        },
-        "comfort": {
-          "mean": 0.2,
-          "confidence": 0.24500000000000002,
-          "n": 1,
-          "last_updated_turn": 3
-        },
-        "crowdedness": {
-          "mean": -0.07499999999999998,
-          "confidence": 0.29000000000000004,
-          "n": 2,
-          "last_updated_turn": 8
-        }
-      },
-      "cafe": {
-        "crowdedness": {
-          "mean": 0.225,
-          "confidence": 0.2475,
-          "n": 1,
-          "last_updated_turn": 14
-        },
-        "quietness": {
-          "mean": -0.35000000000000003,
-          "confidence": 0.2925,
-          "n": 2,
-          "last_updated_turn": 17
-        },
-        "brightness": {
-          "mean": 0.2,
-          "confidence": 0.24500000000000002,
-          "n": 1,
-          "last_updated_turn": 15
-        },
-        "comfort": {
-          "mean": 0.35624999999999996,
-          "confidence": 0.29000000000000004,
-          "n": 2,
-          "last_updated_turn": 16
-        }
-      }
-    },
-    "person": {
-      "mother": {
-        "emotional_stability": {
-          "mean": -0.017187500000000022,
-          "confidence": 0.3825,
-          "n": 4,
-          "last_updated_turn": 13
-        },
-        "warmth": {
-          "mean": 0.225,
-          "confidence": 0.2475,
-          "n": 1,
-          "last_updated_turn": 11
-        }
-      }
-    },
-    "concept": {
-      "success": {
-        "importance": {
-          "mean": 0.39375000000000004,
-          "confidence": 0.29250000000000004,
-          "n": 2,
-          "last_updated_turn": 19
-        },
-        "valence": {
-          "mean": -0.125,
-          "confidence": 0.24000000000000002,
-          "n": 1,
-          "last_updated_turn": 20
-        }
-      }
-    },
+    "place": {},
+    "person": {},
+    "concept": {},
     "activity": {},
     "organization": {},
     "self_state": {}

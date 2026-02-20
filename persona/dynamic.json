@@ -37,8 +37,5 @@
     "negativity_bias": 0.0,
     "social_guard": 0.0,
     "novelty_seeking": 0.0
-  },
-  "last_person_entity": "mother",
-  "last_place_entity": "cafe",
-  "last_entity_focus": "Success"
+  }
 }
