@@ -1,0 +1,48 @@
+{
+  "turn": 0,
+  "trait_vector": {
+    "baseline": {
+      "warmth": 0.6,
+      "sarcasm": 0.1,
+      "formality": 0.2,
+      "openness": 0.9,
+      "dominance": 0.2,
+      "sentimentality": 0.3,
+      "curiosity": 0.4,
+      "optimism": 0.3,
+      "conscientiousness": 0.5
+    },
+    "current": {
+      "warmth": 0.6,
+      "sarcasm": 0.1,
+      "formality": 0.2,
+      "openness": 0.9,
+      "dominance": 0.2,
+      "sentimentality": 0.3,
+      "curiosity": 0.4,
+      "optimism": 0.3,
+      "conscientiousness": 0.5
+    },
+    "initial_baseline": {
+      "warmth": 0.6,
+      "sarcasm": 0.1,
+      "formality": 0.2,
+      "openness": 0.9,
+      "dominance": 0.2,
+      "sentimentality": 0.3,
+      "curiosity": 0.4,
+      "optimism": 0.3,
+      "conscientiousness": 0.5
+    }
+  },
+  "emotion_vector": {
+    "joy": 0.5,
+    "trust": 0.5,
+    "fear": 0.5,
+    "surprise": 0.5,
+    "sadness": 0.5,
+    "disgust": 0.5,
+    "anger": 0.5,
+    "anticipation": 0.5
+  }
+}

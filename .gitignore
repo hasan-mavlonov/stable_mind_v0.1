@@ -1,0 +1,109 @@
+# ================================
+
+# Python
+
+# ================================
+
+**pycache**/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+
+.venv/
+venv/
+env/
+ENV/
+
+# Distribution / packaging
+
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Logs
+
+*.log
+
+# ================================
+
+# Environment & secrets
+
+# ================================
+
+.env
+.env.*
+*.env
+*.local
+
+# ================================
+
+# Django
+
+# ================================
+
+*.sqlite3
+db.sqlite3
+media/
+staticfiles/
+
+# ================================
+
+# IDEs & Editors
+
+# ================================
+
+.idea/
+.vscode/
+*.iml
+
+# ================================
+
+# OS files
+
+# ================================
+
+.DS_Store
+Thumbs.db
+
+# ================================
+
+# Testing & coverage
+
+# ================================
+
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# ================================
+
+# Type checkers / linters
+
+# ================================
+
+.mypy_cache/
+.pyre/
+.ruff_cache/
+
+# ================================
+
+# Misc
+
+# ================================
+
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.pyc
+
+
+# Runtime logs
+logs/*.jsonl
+memory/*.jsonl
+
+# OS
