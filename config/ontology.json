@@ -400,6 +400,26 @@
       "default_mean": 0.0,
       "default_confidence": 0.2,
       "dimensions": {
+        "valence": {
+          "description": "Overall mood positivity vs negativity when explicitly described.",
+          "polarity_high": "positive mood",
+          "polarity_low": "negative mood",
+          "examples_high": [
+            "happy",
+            "good",
+            "great",
+            "excited",
+            "joyful"
+          ],
+          "examples_low": [
+            "sad",
+            "bad",
+            "down",
+            "depressed",
+            "heartbroken",
+            "miserable"
+          ]
+        },
         "confidence": {
           "description": "Self-confidence vs self-doubt.",
           "polarity_high": "confident",

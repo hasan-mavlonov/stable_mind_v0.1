@@ -17,6 +17,52 @@ class Agent:
         self.consolidation = ConsolidationEngine()
 
     # ----------------------------
+    # Small helpers
+    # ----------------------------
+    @staticmethod
+    def _clamp01(x: float) -> float:
+        try:
+            v = float(x)
+        except Exception:
+            v = 0.5
+        if v < 0.0:
+            return 0.0
+        if v > 1.0:
+            return 1.0
+        return v
+
+    @staticmethod
+    def _clamp(x: float, lo: float, hi: float) -> float:
+        try:
+            v = float(x)
+        except Exception:
+            v = lo
+        return max(lo, min(hi, v))
+
+    @staticmethod
+    def _ensure_dynamic_now(dyn: Dict[str, Any]) -> Dict[str, Any]:
+        dyn.setdefault("now", {})
+        now = dyn["now"]
+
+        # mood vector
+        now.setdefault("mood", {})
+        mood = now["mood"]
+        for k in ["joy", "trust", "fear", "surprise", "sadness", "disgust", "anger", "anticipation"]:
+            mood.setdefault(k, 0.5)
+
+        # scalar state
+        now.setdefault("last_updated_turn", 0)
+        now.setdefault("arousal", 0.5)
+        now.setdefault("stress", 0.5)
+        now.setdefault("energy", 0.5)
+        now.setdefault("confidence", 0.5)
+
+        # context
+        now.setdefault("current_topic", None)
+        now.setdefault("current_activity", None)
+        return now
+
+    # ----------------------------
     # Canonicalization / normalization
     # ----------------------------
     def _canonical_entity_name(self, name: str) -> str:
@@ -120,6 +166,170 @@ class Agent:
 
         return out
 
+    # ----------------------------
+    # Dynamic NOW updater (every turn)
+    # ----------------------------
+    def _update_dynamic_now(self, dyn: Dict[str, Any], user_message: str, entities: List[Dict[str, Any]], turn: int) -> None:
+        """
+        Deterministically updates dynamic['now'] each turn using:
+        - keyword cues from user_message
+        - mild influence from extracted perceptions (valence, emotional_stability, warmth, comfort, etc.)
+
+        This is deliberately lightweight and stable (EMA-like).
+        """
+        now = self._ensure_dynamic_now(dyn)
+        mood = now["mood"]
+
+        text = (user_message or "").lower()
+
+        # --- keyword cues (very small, stable nudges)
+        # Each hit adds a delta in [-1, +1] space then we apply small step to [0,1].
+        emotion_hits = {
+            "joy": [
+                "happy", "glad", "joy", "great", "wonderful", "amazing", "excited", "love", "enjoy",
+            ],
+            "trust": [
+                "trust", "safe", "secure", "supported", "reliable",
+            ],
+            "fear": [
+                "afraid", "scared", "fear", "anxious", "worried", "panic",
+            ],
+            "surprise": [
+                "surprised", "shock", "shocked", "unexpected",
+            ],
+            "sadness": [
+                "sad", "down", "depressed", "lonely", "cry", "hurt",
+            ],
+            "disgust": [
+                "disgust", "gross", "nasty", "repuls",  # covers "repulse/repulsed/repulsive"
+            ],
+            "anger": [
+                "angry", "mad", "furious", "rage", "annoyed", "yell", "shout",
+            ],
+            "anticipation": [
+                "hope", "looking forward", "cant wait", "can't wait", "anticipat",
+            ],
+        }
+
+        # Scalar cues
+        stress_up = ["stressed", "overwhelmed", "anxious", "worried", "panic", "tense"]
+        stress_down = ["calm", "relaxed", "peaceful", "at ease"]
+
+        energy_up = ["energized", "energetic", "rested"]
+        energy_down = ["tired", "exhausted", "sleepy", "drained", "burned out", "burnt out"]
+
+        confidence_up = ["confident", "sure", "proud"]
+        confidence_down = ["insecure", "doubt", "uncertain", "ashamed"]
+
+        arousal_up = ["excited", "furious", "panic", "tense", "shocked", "anxious"]
+        arousal_down = ["calm", "relaxed", "peaceful", "sleepy"]
+
+        # --- Compute deltas
+        mood_delta = {k: 0.0 for k in mood.keys()}
+        for emo, keys in emotion_hits.items():
+            for kw in keys:
+                if kw in text:
+                    mood_delta[emo] += 1.0
+
+        def _count_hits(keywords: List[str]) -> float:
+            c = 0.0
+            for kw in keywords:
+                if kw in text:
+                    c += 1.0
+            return c
+
+        d_stress = _count_hits(stress_up) - _count_hits(stress_down)
+        d_energy = _count_hits(energy_up) - _count_hits(energy_down)
+        d_conf = _count_hits(confidence_up) - _count_hits(confidence_down)
+        d_arousal = _count_hits(arousal_up) - _count_hits(arousal_down)
+
+        # --- Influence from perceptions (small, but useful)
+        # Convert [-1,1] perception values into small deltas.
+        for e in entities or []:
+            if not isinstance(e, dict):
+                continue
+            et = e.get("entity_type")
+            dv = e.get("dimension_values", {}) or {}
+            if not isinstance(dv, dict):
+                continue
+
+            # concept valence nudges mood
+            if et == "concept":
+                v = dv.get("valence")
+                if isinstance(v, (int, float)):
+                    # positive valence -> joy up, sadness down
+                    mood_delta["joy"] += float(v) * 0.75
+                    mood_delta["sadness"] -= float(v) * 0.50
+
+            # person cues
+            if et == "person":
+                es = dv.get("emotional_stability")
+                w = dv.get("warmth")
+                if isinstance(es, (int, float)):
+                    # unstable person in context -> stress up a bit
+                    d_stress += (-float(es)) * 0.5
+                    mood_delta["fear"] += (-float(es)) * 0.25
+                if isinstance(w, (int, float)):
+                    mood_delta["trust"] += float(w) * 0.4
+                    mood_delta["joy"] += float(w) * 0.15
+
+            # place cues
+            if et == "place":
+                c = dv.get("comfort")
+                q = dv.get("quietness")
+                if isinstance(c, (int, float)):
+                    d_stress -= float(c) * 0.25
+                    mood_delta["joy"] += float(c) * 0.2
+                if isinstance(q, (int, float)):
+                    d_arousal -= float(q) * 0.15  # quiet reduces arousal slightly
+
+            # self_state cues (if your ontology uses these dims)
+            if et == "self_state":
+                # If you later add these dims to ontology, they will begin to work immediately.
+                s = dv.get("stress")
+                en = dv.get("energy")
+                cf = dv.get("confidence")
+                ar = dv.get("arousal")
+                if isinstance(s, (int, float)):
+                    d_stress += float(s) * 0.75
+                if isinstance(en, (int, float)):
+                    d_energy += float(en) * 0.75
+                if isinstance(cf, (int, float)):
+                    d_conf += float(cf) * 0.75
+                if isinstance(ar, (int, float)):
+                    d_arousal += float(ar) * 0.75
+
+        # --- Apply updates (EMA-ish)
+        # Small step sizes so "now" doesn't jump.
+        MOOD_STEP = 0.06
+        SCALAR_STEP = 0.08
+
+        for k in mood.keys():
+            # turn hit-count into signed delta in [-1,1] (cap)
+            d = self._clamp(mood_delta.get(k, 0.0), -3.0, 3.0) / 3.0
+            mood[k] = self._clamp01(mood[k] + MOOD_STEP * d)
+
+        now["stress"] = self._clamp01(now["stress"] + SCALAR_STEP * self._clamp(d_stress, -2.0, 2.0) / 2.0)
+        now["energy"] = self._clamp01(now["energy"] + SCALAR_STEP * self._clamp(d_energy, -2.0, 2.0) / 2.0)
+        now["confidence"] = self._clamp01(now["confidence"] + SCALAR_STEP * self._clamp(d_conf, -2.0, 2.0) / 2.0)
+        now["arousal"] = self._clamp01(now["arousal"] + SCALAR_STEP * self._clamp(d_arousal, -2.0, 2.0) / 2.0)
+
+        # --- Context fields
+        # current_topic: prefer the latest entity mention
+        if entities:
+            now["current_topic"] = entities[-1].get("entity", now.get("current_topic"))
+
+        # current_activity: if your ontology extracts activity entities, track them
+        for e in reversed(entities or []):
+            if e.get("entity_type") == "activity":
+                now["current_activity"] = e.get("entity")
+                break
+
+        now["last_updated_turn"] = int(turn)
+
+    # ----------------------------
+    # Main step
+    # ----------------------------
     def step(self, user_message: str, session_id: str = "default") -> Dict[str, Any]:
         persona = self.state.load_persona()
         vectors = self.state.load_vectors()
@@ -151,6 +361,9 @@ class Agent:
 
         entities = self._resolve_coreference(entities, wm)
         entities = self._postprocess_entities(entities)
+
+        # --- Update NOW (EVERY TURN)
+        self._update_dynamic_now(dyn=dyn, user_message=user_message, entities=entities, turn=turn)
 
         appended = 0
         if entities:
@@ -217,8 +430,6 @@ class Agent:
         self.state.save_counters(counters)
         self.state.save_vectors(vectors)
 
-        # IMPORTANT FIX:
-        # buffer_size should be items after last_committed_turn (not after current last_buffer_committed_turn)
         last_committed_now = int(counters.get("last_buffer_committed_turn", 0))
         uncommitted = self.state.read_buffered_perceptions(
             min_turn_exclusive=last_committed_now,
@@ -232,5 +443,6 @@ class Agent:
             "buffer_appended": appended,
             "buffer_size": len(uncommitted),
             "did_ruminate": did_ruminate,
-            "beliefs": persona.get("stable", {}).get("beliefs", {})
+            "beliefs": persona.get("stable", {}).get("beliefs", {}),
+            "now": persona.get("dynamic", {}).get("now", {}),
         }

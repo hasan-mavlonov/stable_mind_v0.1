@@ -70,7 +70,6 @@ class PerceptionEngine:
         args = self._validate_tool_args_shape(args)
         entities = self._normalize_entities(args)
 
-        # write only after success
         self._append_jsonl({
             "turn": turn,
             "session_id": session_id,
@@ -89,7 +88,6 @@ class PerceptionEngine:
 
     def _build_tool_schema(self) -> Dict[str, Any]:
         """
-        IMPORTANT:
         OpenAI tool-parameter JSON schema is a restricted subset.
         Use an array of (dimension, value) objects (not open-ended dict).
         """
@@ -162,6 +160,12 @@ class PerceptionEngine:
         }
 
     def _build_instructions(self) -> str:
+        """
+        Key fixes:
+        - Make self_state extraction explicit and usable with your current ontology (confidence/stress/energy)
+        - Make negative relationship statements map to person.warmth negative (boyfriend hates me etc.)
+        - Keep your rule: no valence for neutral factual statements
+        """
         return (
             "You are a perception extractor.\n"
             "Return JSON arguments for the function tool `extract_perceptions`.\n\n"
@@ -177,28 +181,49 @@ class PerceptionEngine:
             "5) If the text does not support ANY dimension from the ontology, return {\"entities\":[]}.\n\n"
 
             "IMPORTANT behavior constraints:\n"
-            "- Do NOT create entity_type='person' for first-person pronouns (I/me/my). If the text is about the speaker's state, prefer entity_type='self_state' with entity='self' ONLY if the ontology supports a matching self_state dimension. Otherwise return empty.\n"
+            "- Do NOT create entity_type='person' for first-person pronouns (I/me/my).\n"
+            "- If the text explicitly describes the speaker's internal state, use entity_type='self_state' with entity='self'.\n"
             "- Do NOT treat animals/objects as entity_type='person'. If unsure, prefer entity_type='concept'.\n"
-            "- Do NOT assign valence to factual statements without sentiment. Example: \"It is raining\" -> return {\"entities\":[]} unless the text expresses liking/disliking.\n\n"
+            "- Do NOT assign concept.valence to purely factual statements without sentiment.\n\n"
+
+            "SELF-STATE mapping (use these when explicitly stated):\n"
+            "- \"I am stressed/anxious/overwhelmed/scared/panicking\" -> self_state:self, dimension 'stress' HIGH (positive).\n"
+            "- \"I am calm/relaxed\" -> self_state:self, dimension 'stress' LOW (negative).\n"
+            "- \"I am tired/exhausted/drained\" OR \"I want to sleep\" -> self_state:self, dimension 'energy' LOW (negative).\n"
+            "- \"I am energized/full of energy\" -> self_state:self, dimension 'energy' HIGH (positive).\n"
+            "- \"I feel confident\" -> self_state:self, dimension 'confidence' HIGH (positive).\n"
+            "- \"I doubt myself / I can't do this\" -> self_state:self, dimension 'confidence' LOW (negative).\n"
+            "- \"I feel sad/bad/hurt\" ONLY if your ontology has a matching self_state dimension. If not, DO NOT invent one.\n"
+            "  If no mood/valence dimension exists, prefer mapping sadness ONLY when it clearly implies stress (e.g., overwhelmed/heartbroken) -> stress HIGH.\n\n"
+
+            "RELATIONSHIP / PERSON mapping:\n"
+            "- \"X is kind/supportive/caring\" -> person:X, warmth HIGH.\n"
+            "- \"X is cold/mean/hostile\" -> person:X, warmth LOW.\n"
+            "- \"X hates me\" or \"X doesn't like me\" or \"X doesn't love me\" -> person:X, warmth LOW.\n"
+            "- \"X broke up with me\" -> person:X, warmth LOW ONLY if the text frames it as rejection/hurt. Otherwise omit.\n\n"
 
             "Preference mapping (IMPORTANT):\n"
-            "- \"I like/love/enjoy X\" -> entity_type='concept', entity=X, dimension 'valence' positive (and optionally 'importance' if the text emphasizes it).\n"
-            "- \"I dislike/hate X\" -> entity_type='concept', entity=X, dimension 'valence' negative.\n\n"
+            "- \"I like/love/enjoy X\" -> concept:X, dimension 'valence' positive (and optionally 'importance' if emphasized).\n"
+            "- \"I dislike/hate X\" -> concept:X, dimension 'valence' negative.\n\n"
 
-            "Mapping guidance:\n"
+            "Place mapping guidance:\n"
             "- Noise/silence -> quietness.\n"
             "- Number of people -> crowdedness.\n"
             "- Light/dark -> brightness.\n"
             "- Comfort/cozy/stuffy -> comfort.\n"
-            "- Beauty/ugliness -> aesthetic.\n"
+            "- Beauty/ugliness -> aesthetic.\n\n"
+
+            "Person mapping guidance:\n"
             "- Anxiety/yelling/calm (person) -> emotional_stability.\n"
-            "- Kindness/support -> warmth.\n"
+            "- Kindness/support -> warmth.\n\n"
+
+            "Concept mapping guidance:\n"
             "- Importance/meaning -> importance.\n"
             "- Overrated/bad/good (concept) -> valence.\n\n"
 
             "Example:\n"
-            'Input: "The park was empty and very quiet."\n'
-            "Return:\n"
+            'Input: \"The park was empty and very quiet.\"\\n'
+            "Return:\\n"
             '{"entities":[{"entity_type":"place","entity":"park","dimensions":[{"dimension":"quietness","value":0.8},{"dimension":"crowdedness","value":-0.7}],"confidence":0.9}]}\n'
         )
 
@@ -228,7 +253,6 @@ class PerceptionEngine:
                     if getattr(c, "name", None) == self.TOOL_NAME:
                         return _parse_args(getattr(c, "arguments", "{}"))
 
-        # Fallback: maybe model responded as plain text JSON
         try:
             text = response.output_text
             return json.loads(text)

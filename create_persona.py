@@ -155,7 +155,7 @@ def main() -> None:
     counters = {
         "current_turn": 0,
         "last_rumination_turn": 0,
-        "rumination_window_size": 5,
+        "rumination_window_size": 1,
         "turns_since_last_rumination": 0,
         # NEW (for JSONL buffering approach)
         "last_buffer_committed_turn": 0,
