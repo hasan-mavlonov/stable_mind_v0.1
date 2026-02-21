@@ -2,5 +2,7 @@
   "current_turn": 0,
   "last_rumination_turn": 0,
   "rumination_window_size": 5,
-  "turns_since_last_rumination": 0
+  "turns_since_last_rumination": 0,
+  "last_buffer_committed_turn": 0,
+  "last_stable_traits_update_turn": 0
 }

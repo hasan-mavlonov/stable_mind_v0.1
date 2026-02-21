@@ -1,6 +1,5 @@
 from core.agent import Agent
 import json
-import random
 
 a = Agent(root_dir=".", model="gpt-4.1-mini")
 
@@ -21,24 +20,16 @@ test_inputs = [
     "My mother was supportive and kind.",
     "She was emotionally stable this time.",
     "She yelled again today.",
-
-    # new place
-    "The cafe was crowded and loud.",
-    "The cafe was bright and clean.",
-    "The cafe felt cozy and comfortable.",
-    "The cafe was chaotic today.",
-
-    # concept
-    "I think success is very important.",
-    "Success feels meaningful to me.",
-    "Success is overrated sometimes."
 ]
 
-for i, text in enumerate(test_inputs, start=1):
+for text in test_inputs:
     out = a.step(text, session_id="stress")
     print("\nTURN:", out["turn"])
     print("INPUT:", text)
-    print("PERCEIVED:", json.dumps(out["perceived_entities"], indent=2))
-    print("PLACE BELIEFS:", json.dumps(out["beliefs"].get("place", {}), indent=2))
-    print("PERSON BELIEFS:", json.dumps(out["beliefs"].get("person", {}), indent=2))
-    print("CONCEPT BELIEFS:", json.dumps(out["beliefs"].get("concept", {}), indent=2))
+    print("PERCEIVED:", json.dumps(out["perceived_entities"], indent=2, ensure_ascii=False))
+    print("BUFFER APPENDED:", out["buffer_appended"])
+    print("BUFFER SIZE (uncommitted):", out["buffer_size"])
+    print("DID RUMINATE:", out["did_ruminate"])
+    print("PLACE BELIEFS:", json.dumps(out["beliefs"].get("place", {}), indent=2, ensure_ascii=False))
+    print("PERSON BELIEFS:", json.dumps(out["beliefs"].get("person", {}), indent=2, ensure_ascii=False))
+    print("CONCEPT BELIEFS:", json.dumps(out["beliefs"].get("concept", {}), indent=2, ensure_ascii=False))

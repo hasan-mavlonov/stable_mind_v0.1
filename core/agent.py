@@ -1,5 +1,5 @@
 # core/agent.py
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 from .state_manager import StateManager
 from .perception import PerceptionEngine
@@ -16,6 +16,55 @@ class Agent:
         # Consolidation will run ONLY during rumination (Option A)
         self.consolidation = ConsolidationEngine()
 
+    # ----------------------------
+    # Coreference / normalization
+    # ----------------------------
+    def _resolve_coreference(self, entities: List[Dict[str, Any]], wm: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """
+        Rewrite ambiguous references (e.g., "she", "here") into last known concrete entities
+        stored in working memory. This prevents stable beliefs from splitting into separate keys.
+        """
+        if not entities:
+            return entities
+
+        last_person = wm.get("last_person_entity")
+        last_place = wm.get("last_place_entity")
+
+        PERSON_PRONOUNS = {
+            "she", "her", "hers",
+            "he", "him", "his",
+            "they", "them", "their", "theirs",
+            "this person", "that person",
+        }
+
+        PLACE_DEIXIS = {"here", "there", "this place", "that place"}
+
+        resolved: List[Dict[str, Any]] = []
+        for e in entities:
+            if not isinstance(e, dict):
+                continue
+
+            et = e.get("entity_type")
+            name = e.get("entity")
+
+            # Only rewrite if entity is a string
+            if isinstance(name, str):
+                key = name.strip().lower()
+
+                # Person coreference
+                if et == "person" and key in PERSON_PRONOUNS and isinstance(last_person, str) and last_person.strip():
+                    e = dict(e)
+                    e["entity"] = last_person
+
+                # Place deixis
+                if et == "place" and key in PLACE_DEIXIS and isinstance(last_place, str) and last_place.strip():
+                    e = dict(e)
+                    e["entity"] = last_place
+
+            resolved.append(e)
+
+        return resolved
+
     def step(self, user_message: str, session_id: str = "default") -> Dict[str, Any]:
         persona = self.state.load_persona()
         vectors = self.state.load_vectors()
@@ -23,7 +72,7 @@ class Agent:
 
         # ---- Turn increment
         counters["current_turn"] = int(counters.get("current_turn", 0)) + 1
-        turn = counters["current_turn"]
+        turn = int(counters["current_turn"])
 
         # Track turns since last rumination
         counters["turns_since_last_rumination"] = int(counters.get("turns_since_last_rumination", 0)) + 1
@@ -34,7 +83,8 @@ class Agent:
         dyn = persona["dynamic"]
         dyn.setdefault("working_memory", {})
         wm = dyn["working_memory"]
-        wm.setdefault("perception_buffer", [])
+
+        # WM fields (keep WM light; buffer is now JSONL)
         wm.setdefault("recent_entities", [])
         wm.setdefault("recent_events", [])
         wm.setdefault("open_threads", [])
@@ -49,15 +99,22 @@ class Agent:
         )
         entities = perception_result.entities
 
-        # --- Update working memory + buffer perceptions
-        # Buffer the normalized perception entities (so consolidation uses the same format)
-        if entities:
-            wm["perception_buffer"].extend(entities)
+        # --- Coreference resolution BEFORE buffering + BEFORE updating last_* trackers
+        entities = self._resolve_coreference(entities, wm)
 
-            # Track last mentions for convenience
+        # --- Update working memory + append perceptions to JSONL buffer
+        appended = 0
+        if entities:
+            appended = self.state.append_perceptions_to_buffer(
+                perceptions=entities,
+                turn=turn,
+                session_id=session_id,
+            )
+
+            # Track last mentions for convenience (post-resolution)
             wm["last_entity_focus"] = entities[-1]["entity"]
 
-            # last_person_entity / last_place_entity convenience
+            # Update last_person_entity / last_place_entity based on resolved entities
             for e in reversed(entities):
                 if e.get("entity_type") == "person":
                     wm["last_person_entity"] = e.get("entity")
@@ -85,32 +142,53 @@ class Agent:
 
         # --- Rumination trigger (ONLY THEN update stable beliefs)
         did_ruminate = False
-        if counters["turns_since_last_rumination"] >= window:
+        if int(counters["turns_since_last_rumination"]) >= window:
             did_ruminate = True
 
-            buffered = wm.get("perception_buffer", [])
-            if isinstance(buffered, list) and buffered:
+            last_committed = int(counters.get("last_buffer_committed_turn", 0))
+
+            buffered = self.state.read_buffered_perceptions(
+                min_turn_exclusive=last_committed,
+                max_turn_inclusive=turn,
+                session_id=session_id,  # keep stress test isolated
+            )
+
+            if buffered:
                 self.consolidation.run(
                     persona=persona,
                     perceptions=buffered,
                     turn=turn
                 )
 
-            # Clear buffer after rumination
-            wm["perception_buffer"] = []
+            # Advance commit pointer
+            counters["last_buffer_committed_turn"] = turn
 
+            # Reset rumination timing
             counters["last_rumination_turn"] = turn
             counters["turns_since_last_rumination"] = 0
+
+            # Optional: vacuum old buffer lines (keeps file small)
+            # Keep only turns > (turn - 200) to avoid unbounded growth
+            self.state.vacuum_buffer_keep_recent(keep_turn_greater_than=max(0, turn - 200), max_lines_keep=5000)
 
         # Save everything
         self.state.save_persona(persona)
         self.state.save_counters(counters)
         self.state.save_vectors(vectors)
 
+        # "buffer_size": how many uncommitted items exist right now (estimate by reading range)
+        last_committed_now = int(counters.get("last_buffer_committed_turn", 0)) if did_ruminate else int(counters.get("last_buffer_committed_turn", 0))
+        uncommitted = self.state.read_buffered_perceptions(
+            min_turn_exclusive=last_committed_now,
+            max_turn_inclusive=turn,
+            session_id=session_id,
+        )
+
         return {
             "turn": turn,
             "perceived_entities": entities,
-            "buffer_size": len(wm.get("perception_buffer", [])),
+            "buffer_appended": appended,
+            "buffer_size": len(uncommitted),
             "did_ruminate": did_ruminate,
             "beliefs": persona.get("stable", {}).get("beliefs", {})
         }

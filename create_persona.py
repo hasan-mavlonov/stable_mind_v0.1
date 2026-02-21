@@ -23,6 +23,14 @@ def write_json(path: Path, data: Dict[str, Any]) -> None:
     path.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
+def reset_jsonl(path: Path) -> None:
+    """
+    Truncate/initialize a JSONL file.
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("", encoding="utf-8")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=str, default=".")
@@ -32,6 +40,7 @@ def main() -> None:
 
     persona_dir = root / "persona"
     state_dir = root / "state"
+    memory_dir = root / "memory"
 
     # -------------------------------
     # 1️⃣ Immutable
@@ -100,7 +109,8 @@ def main() -> None:
             "recent_entities": [],
             "recent_events": [],
             "open_threads": [],
-            # Buffer perceptions until rumination (Option A)
+            # NOTE: if you moved buffering to JSONL (recommended),
+            # keep this empty or remove it in your runtime logic.
             "perception_buffer": []
         },
         "short_term_preferences": {
@@ -141,15 +151,20 @@ def main() -> None:
         "emotion_vector": {e: 0.5 for e in EMOTIONS_8}
     }
 
+    # If you're using JSONL buffer + commit pointer, initialize it here too.
     counters = {
         "current_turn": 0,
         "last_rumination_turn": 0,
         "rumination_window_size": 5,
-        "turns_since_last_rumination": 0
+        "turns_since_last_rumination": 0,
+        # NEW (for JSONL buffering approach)
+        "last_buffer_committed_turn": 0,
+        # Optional: if you use trait gating
+        "last_stable_traits_update_turn": 0
     }
 
     # -------------------------------
-    # Write files
+    # Write persona/state files
     # -------------------------------
     write_json(persona_dir / "immutable.json", immutable)
     write_json(persona_dir / "stable.json", stable)
@@ -157,8 +172,14 @@ def main() -> None:
     write_json(state_dir / "vectors.json", vectors)
     write_json(state_dir / "counters.json", counters)
 
+    # -------------------------------
+    # Reset memory JSONL files
+    # -------------------------------
+    reset_jsonl(memory_dir / "perceptions.jsonl")
+    reset_jsonl(memory_dir / "perception_buffer.jsonl")
+
     print("✅ Persona created successfully.")
-    print("All files initialized.")
+    print("All files initialized (including memory JSONL resets).")
 
 
 if __name__ == "__main__":
