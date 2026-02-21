@@ -22,14 +22,16 @@ class PerceptionResult:
 
 class PerceptionEngine:
     """
-    Uses an LLM to extract *perceptions* from user text:
+    Uses an LLM to extract *perceptions* from user text.
+
+    Tool-output format:
     - entity_type (must exist in ontology.json)
     - entity (string)
-    - dimensions: list of {"dimension": str, "value": float in [-1,1]}   (tool-output format)
+    - dimensions: list of {"dimension": str, "value": float in [-1,1]}
     - confidence: 0..1
 
-    Internally, we normalize tool-output "dimensions" into:
-      dimension_values: Dict[dimension -> float] (filtered to ontology dimensions)
+    Internal normalized format:
+    - dimension_values: Dict[dimension -> float] filtered to ontology dimensions
     """
 
     TOOL_NAME = "extract_perceptions"
@@ -46,8 +48,6 @@ class PerceptionEngine:
         self.state_counters_path = self.root / "state" / "counters.json"
 
         self.mem_path.parent.mkdir(parents=True, exist_ok=True)
-
-        # Debug: confirm ontology loads
 
     # ---------- public ----------
 
@@ -66,22 +66,8 @@ class PerceptionEngine:
             temperature=0.2,
         )
 
-        # Debug (keep while developing; remove later if noisy)
-        # print("=== RESPONSE TYPE ===", type(response))
-        # try:
-        #     print("=== RESPONSE DUMP ===")
-        #     print(json.dumps(response.model_dump(), indent=2))
-        # except Exception as e:
-        #     print("model_dump failed:", e)
-        #     print("RAW response:", response)
-        # print("=== OUTPUT TEXT ===", getattr(response, "output_text", None))
-        # print("=== OUTPUT FIELD ===", getattr(response, "output", None))
-
         args = self._extract_function_args(response)
-
-        # Defensive validation: keep only entities that match the tool-output shape
         args = self._validate_tool_args_shape(args)
-
         entities = self._normalize_entities(args)
 
         # write only after success
@@ -105,9 +91,7 @@ class PerceptionEngine:
         """
         IMPORTANT:
         OpenAI tool-parameter JSON schema is a restricted subset.
-        - `minProperties` is not permitted
-        - open-ended dict schemas via `additionalProperties` can be rejected or cause required mismatch
-        So we represent dimension ratings as an array of (dimension, value) objects.
+        Use an array of (dimension, value) objects (not open-ended dict).
         """
         entity_types = self.ontology.get("entity_types", {})
         allowed_types = sorted(entity_types.keys())
@@ -180,21 +164,26 @@ class PerceptionEngine:
     def _build_instructions(self) -> str:
         return (
             "You are a perception extractor.\n"
-            "You MUST return JSON arguments for the function tool `extract_perceptions`.\n\n"
+            "Return JSON arguments for the function tool `extract_perceptions`.\n\n"
 
-            "Every returned entity MUST include ALL fields:\n"
-            "- entity_type\n"
-            "- entity\n"
-            "- dimensions (array of {dimension, value}) with at least ONE item\n"
-            "- confidence\n\n"
+            "Output format:\n"
+            '{"entities":[{"entity_type":"...","entity":"...","dimensions":[{"dimension":"...","value":0.0}],"confidence":0.0}]}\n\n'
 
-            "If you cannot support ANY dimension from the text, return:\n"
-            '{"entities":[]}\n\n'
+            "Rules:\n"
+            "1) Only use entity types defined in ontology.\n"
+            "2) Only use dimensions defined for that entity type.\n"
+            "3) If you return an entity, `dimensions` MUST contain at least one item.\n"
+            "4) Values must be in [-1, 1]. Stronger wording -> larger magnitude.\n"
+            "5) If the text does not support ANY dimension from the ontology, return {\"entities\":[]}.\n\n"
 
-            "Example:\n"
-            'Input: "The park was empty and very quiet."\n'
-            "Return:\n"
-            '{"entities":[{"entity_type":"place","entity":"park","dimensions":[{"dimension":"quietness","value":0.8},{"dimension":"crowdedness","value":-0.7}],"confidence":0.9}]}\n\n'
+            "IMPORTANT behavior constraints:\n"
+            "- Do NOT create entity_type='person' for first-person pronouns (I/me/my). If the text is about the speaker's state, prefer entity_type='self_state' with entity='self' ONLY if the ontology supports a matching self_state dimension. Otherwise return empty.\n"
+            "- Do NOT treat animals/objects as entity_type='person'. If unsure, prefer entity_type='concept'.\n"
+            "- Do NOT assign valence to factual statements without sentiment. Example: \"It is raining\" -> return {\"entities\":[]} unless the text expresses liking/disliking.\n\n"
+
+            "Preference mapping (IMPORTANT):\n"
+            "- \"I like/love/enjoy X\" -> entity_type='concept', entity=X, dimension 'valence' positive (and optionally 'importance' if the text emphasizes it).\n"
+            "- \"I dislike/hate X\" -> entity_type='concept', entity=X, dimension 'valence' negative.\n\n"
 
             "Mapping guidance:\n"
             "- Noise/silence -> quietness.\n"
@@ -207,19 +196,15 @@ class PerceptionEngine:
             "- Importance/meaning -> importance.\n"
             "- Overrated/bad/good (concept) -> valence.\n\n"
 
-            "Hard constraints:\n"
-            "1) Only use entity types defined in ontology.\n"
-            "2) Only use dimensions defined for that entity type.\n"
-            "3) If an entity is returned, dimensions MUST contain at least one item.\n"
-            "4) Use numeric values in [-1, 1]. Strong wording -> larger magnitude.\n"
+            "Example:\n"
+            'Input: "The park was empty and very quiet."\n'
+            "Return:\n"
+            '{"entities":[{"entity_type":"place","entity":"park","dimensions":[{"dimension":"quietness","value":0.8},{"dimension":"crowdedness","value":-0.7}],"confidence":0.9}]}\n'
         )
 
     # ---------- parsing ----------
 
     def _extract_function_args(self, response: Any) -> Dict[str, Any]:
-        """
-        Extract tool call arguments from Responses API.
-        """
         def _parse_args(raw_args: Any) -> Dict[str, Any]:
             if isinstance(raw_args, dict):
                 return raw_args
@@ -251,10 +236,6 @@ class PerceptionEngine:
             return {"entities": []}
 
     def _validate_tool_args_shape(self, args: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Ensure the parsed args follow the tool-output shape:
-        entities: [{entity_type, entity, dimensions(list), confidence}]
-        """
         ents = args.get("entities", [])
         if not isinstance(ents, list):
             return {"entities": []}
@@ -272,15 +253,6 @@ class PerceptionEngine:
         return {"entities": cleaned}
 
     def _normalize_entities(self, args: Dict[str, Any]) -> List[Dict[str, Any]]:
-        """
-        Normalize tool-output entities into internal entities:
-        {
-          "entity_type": et,
-          "entity": "...",
-          "dimension_values": {dim: value},   # filtered to ontology + clamped
-          "confidence": conf
-        }
-        """
         entity_types = self.ontology.get("entity_types", {})
         out: List[Dict[str, Any]] = []
 
@@ -322,7 +294,6 @@ class PerceptionEngine:
                 except Exception:
                     continue
 
-                # clamp [-1, 1]
                 if vv < -1.0:
                     vv = -1.0
                 if vv > 1.0:
@@ -330,7 +301,6 @@ class PerceptionEngine:
 
                 filtered[k] = vv
 
-            # require at least one supported dimension
             if not filtered:
                 continue
 
