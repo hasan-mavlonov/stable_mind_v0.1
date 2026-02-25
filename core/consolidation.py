@@ -10,19 +10,28 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
-# core/consolidation.py
-from typing import Dict, Any, List
+from typing import Any, Dict, List
 
 
-def clamp(x: float, lo: float, hi: float):
+def clamp(x: float, lo: float, hi: float) -> float:
     return max(lo, min(hi, x))
 
 
 class ConsolidationEngine:
     """
     Updates persona['stable']['beliefs'] using perception results.
-    Perception format:
 
+    Belief schema per (entity_type, entity, dimension):
+    {
+        "mean": float in [-1,1],
+        "baseline_mean": float in [-1,1],   # last reflection checkpoint anchor
+        "confidence": float in [0,1],
+        "n": int,
+        "last_updated_turn": int,
+        "baseline_turn": int               # when baseline_mean was last set
+    }
+
+    Perception format:
     {
         "entity_type": str,
         "entity": str,
@@ -35,7 +44,7 @@ class ConsolidationEngine:
         self.alpha = alpha
         self.conf_gain = conf_gain
 
-    def run(self, persona: Dict[str, Any], perceptions: List[Dict[str, Any]], turn: int):
+    def run(self, persona: Dict[str, Any], perceptions: List[Dict[str, Any]], turn: int) -> None:
         stable = persona.setdefault("stable", {})
         beliefs = stable.setdefault("beliefs", {})
 
@@ -45,34 +54,41 @@ class ConsolidationEngine:
             dim_values = obs.get("dimension_values", {})
             obs_conf = float(obs.get("confidence", 0.5))
 
-            # ensure entity_type block exists
             type_block = beliefs.setdefault(entity_type, {})
-
-            # ensure entity block exists
             entity_block = type_block.setdefault(entity, {})
 
             for dim, value in dim_values.items():
-                # create dimension belief if not exist
-                dim_block = entity_block.setdefault(dim, {
-                    "mean": 0.0,
-                    "confidence": 0.2,
-                    "n": 0,
-                    "last_updated_turn": turn
-                })
+                dim_block = entity_block.setdefault(
+                    dim,
+                    {
+                        "mean": 0.0,
+                        "baseline_mean": 0.0,
+                        "confidence": 0.2,
+                        "n": 0,
+                        "last_updated_turn": int(turn),
+                        "baseline_turn": 0,
+                    },
+                )
+
+                # Backfill baseline fields if older belief records exist
+                if "baseline_mean" not in dim_block:
+                    dim_block["baseline_mean"] = float(dim_block.get("mean", 0.0))
+                if "baseline_turn" not in dim_block:
+                    dim_block["baseline_turn"] = int(dim_block.get("last_updated_turn", turn))
 
                 old_mean = float(dim_block.get("mean", 0.0))
 
-                # exponential smoothing
+                # Exponential smoothing
                 new_mean = (1 - self.alpha) * old_mean + self.alpha * float(value)
                 new_mean = clamp(new_mean, -1.0, 1.0)
 
                 dim_block["mean"] = new_mean
                 dim_block["n"] = int(dim_block.get("n", 0)) + 1
-                dim_block["last_updated_turn"] = turn
+                dim_block["last_updated_turn"] = int(turn)
 
-                # confidence grows with supporting evidence
+                # Confidence grows with supporting evidence
                 dim_block["confidence"] = clamp(
                     float(dim_block.get("confidence", 0.2)) + self.conf_gain * obs_conf,
                     0.0,
-                    1.0
+                    1.0,
                 )
