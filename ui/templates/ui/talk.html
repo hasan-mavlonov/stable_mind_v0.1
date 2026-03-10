@@ -1,0 +1,25 @@
+{% extends "ui/base.html" %}
+
+{% block content %}
+<h1>Talk with StableMind</h1>
+<p>Ask Rin about beliefs that already exist in the persona.</p>
+
+<form method="post">
+    {% csrf_token %}
+
+    <textarea name="message" rows="5" cols="70" placeholder="Type your question here...">{% if user_text %}{{ user_text }}{% endif %}</textarea>
+
+    <br><br>
+    <button type="submit">Send</button>
+</form>
+
+{% if answer %}
+    <hr>
+
+    <h3>You</h3>
+    <p>{{ user_text }}</p>
+
+    <h3>Rin</h3>
+    <p>{{ answer }}</p>
+{% endif %}
+{% endblock %}

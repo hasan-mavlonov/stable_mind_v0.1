@@ -13,10 +13,66 @@
   },
   "beliefs": {
     "place": {},
-    "person": {},
-    "concept": {},
+    "person": {
+      "mom": {
+        "emotional_stability": {
+          "mean": -0.2,
+          "baseline_mean": 0.0,
+          "confidence": 0.24500000000000002,
+          "n": 1,
+          "last_updated_turn": 2,
+          "baseline_turn": 0
+        }
+      },
+      "dad": {
+        "warmth": {
+          "mean": -0.225,
+          "baseline_mean": 0.0,
+          "confidence": 0.2475,
+          "n": 1,
+          "last_updated_turn": 4,
+          "baseline_turn": 0
+        }
+      }
+    },
+    "concept": {
+      "weather": {
+        "valence": {
+          "mean": -0.2,
+          "baseline_mean": 0.0,
+          "confidence": 0.24500000000000002,
+          "n": 1,
+          "last_updated_turn": 1,
+          "baseline_turn": 0
+        }
+      },
+      "dog": {
+        "valence": {
+          "mean": -0.175,
+          "baseline_mean": 0.0,
+          "confidence": 0.24500000000000002,
+          "n": 1,
+          "last_updated_turn": 3,
+          "baseline_turn": 0
+        }
+      }
+    },
     "activity": {},
     "organization": {},
-    "self_state": {}
+    "self_state": {
+      "self": {
+        "stress": {
+          "mean": 0.225,
+          "baseline_mean": 0.0,
+          "confidence": 0.2475,
+          "n": 1,
+          "last_updated_turn": 4,
+          "baseline_turn": 0
+        }
+      }
+    }
+  },
+  "trait_vector": {
+    "trust": 0.0
   }
 }

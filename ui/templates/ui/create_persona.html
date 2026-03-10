@@ -1,0 +1,15 @@
+{% extends "ui/base.html" %}
+
+{% block content %}
+<h1>Create Persona</h1>
+<p>This will reset and initialize the persona, state, and memory files.</p>
+
+{% if success_message %}
+    <p>{{ success_message }}</p>
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Initialize Fresh Persona</button>
+</form>
+{% endblock %}

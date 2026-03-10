@@ -1,0 +1,234 @@
+{% extends "ui/base.html" %}
+
+{% block content %}
+<h1>Persona Viewer</h1>
+<p>Current StableMind persona state.</p>
+
+<hr>
+
+<h2>Identity</h2>
+<div>
+    <p><strong>ID:</strong> {{ immutable.id }}</p>
+    <p><strong>Display Name:</strong> {{ immutable.display_name }}</p>
+    <p><strong>Username:</strong> {{ immutable.username }}</p>
+    <p><strong>Nationality:</strong> {{ immutable.nationality }}</p>
+</div>
+
+<h3>Origin</h3>
+<div>
+    <p><strong>Birth City:</strong> {{ immutable.origin.birth_city }}</p>
+    <p><strong>Current City at Creation:</strong> {{ immutable.origin.current_city_at_creation }}</p>
+    <p><strong>Story:</strong> {{ immutable.origin.story|default:"—" }}</p>
+</div>
+
+<h3>Appearance Markers</h3>
+<div>
+    <p><strong>Eye Color:</strong> {{ immutable.immutable_appearance_markers.origin_eye_color }}</p>
+    <p><strong>Hair Color:</strong> {{ immutable.immutable_appearance_markers.origin_hair_color }}</p>
+</div>
+
+<hr>
+
+<h2>Personality</h2>
+<div>
+    <p><strong>MBTI:</strong> {{ personality.mbti }}</p>
+    <p><strong>Tone of Voice:</strong> {{ personality.tone_of_voice }}</p>
+</div>
+
+<h3>Core Traits</h3>
+<ul>
+    {% for trait in personality.core_traits %}
+        <li>{{ trait }}</li>
+    {% empty %}
+        <li>No core traits available.</li>
+    {% endfor %}
+</ul>
+
+<h3>Values</h3>
+<ul>
+    {% for value in personality.values %}
+        <li>{{ value }}</li>
+    {% empty %}
+        <li>No values available.</li>
+    {% endfor %}
+</ul>
+
+<hr>
+
+<h2>Beliefs</h2>
+
+<h3>Place</h3>
+{% if beliefs.place %}
+    <ul>
+        {% for key, value in beliefs.place.items %}
+            <li><strong>{{ key }}</strong>: {{ value }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No place beliefs yet.</p>
+{% endif %}
+
+<h3>Person</h3>
+{% if beliefs.person %}
+    <ul>
+        {% for key, value in beliefs.person.items %}
+            <li><strong>{{ key }}</strong>: {{ value }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No person beliefs yet.</p>
+{% endif %}
+
+<h3>Concept</h3>
+{% if beliefs.concept %}
+    <ul>
+        {% for key, value in beliefs.concept.items %}
+            <li><strong>{{ key }}</strong>: {{ value }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No concept beliefs yet.</p>
+{% endif %}
+
+<h3>Activity</h3>
+{% if beliefs.activity %}
+    <ul>
+        {% for key, value in beliefs.activity.items %}
+            <li><strong>{{ key }}</strong>: {{ value }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No activity beliefs yet.</p>
+{% endif %}
+
+<h3>Organization</h3>
+{% if beliefs.organization %}
+    <ul>
+        {% for key, value in beliefs.organization.items %}
+            <li><strong>{{ key }}</strong>: {{ value }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No organization beliefs yet.</p>
+{% endif %}
+
+<h3>Self State</h3>
+{% if beliefs.self_state %}
+    <ul>
+        {% for key, value in beliefs.self_state.items %}
+            <li><strong>{{ key }}</strong>: {{ value }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No self-state beliefs yet.</p>
+{% endif %}
+
+<hr>
+
+<h2>Current State</h2>
+<div>
+    <p><strong>Last Updated Turn:</strong> {{ now.last_updated_turn }}</p>
+    <p><strong>Arousal:</strong> {{ now.arousal }}</p>
+    <p><strong>Stress:</strong> {{ now.stress }}</p>
+    <p><strong>Energy:</strong> {{ now.energy }}</p>
+    <p><strong>Confidence:</strong> {{ now.confidence }}</p>
+    <p><strong>Current Topic:</strong> {{ now.current_topic|default:"—" }}</p>
+    <p><strong>Current Activity:</strong> {{ now.current_activity|default:"—" }}</p>
+</div>
+
+<h3>Mood</h3>
+<ul>
+    {% for emotion, value in now.mood.items %}
+        <li><strong>{{ emotion }}:</strong> {{ value }}</li>
+    {% empty %}
+        <li>No mood data available.</li>
+    {% endfor %}
+</ul>
+
+<hr>
+
+<h2>Working Memory</h2>
+<div>
+    <p><strong>Last Entity Focus:</strong> {{ working_memory.last_entity_focus|default:"—" }}</p>
+    <p><strong>Last Person Entity:</strong> {{ working_memory.last_person_entity|default:"—" }}</p>
+    <p><strong>Last Place Entity:</strong> {{ working_memory.last_place_entity|default:"—" }}</p>
+</div>
+
+<h3>Recent Entities</h3>
+<ul>
+    {% for item in working_memory.recent_entities %}
+        <li>{{ item }}</li>
+    {% empty %}
+        <li>No recent entities.</li>
+    {% endfor %}
+</ul>
+
+<h3>Recent Events</h3>
+<ul>
+    {% for item in working_memory.recent_events %}
+        <li>{{ item }}</li>
+    {% empty %}
+        <li>No recent events.</li>
+    {% endfor %}
+</ul>
+
+<h3>Open Threads</h3>
+<ul>
+    {% for item in working_memory.open_threads %}
+        <li>{{ item }}</li>
+    {% empty %}
+        <li>No open threads.</li>
+    {% endfor %}
+</ul>
+
+<hr>
+
+<h2>Short-Term Preferences</h2>
+
+<h3>Recent Likes</h3>
+<ul>
+    {% for item in short_term_preferences.recent_likes %}
+        <li>{{ item }}</li>
+    {% empty %}
+        <li>No recent likes.</li>
+    {% endfor %}
+</ul>
+
+<h3>Recent Dislikes</h3>
+<ul>
+    {% for item in short_term_preferences.recent_dislikes %}
+        <li>{{ item }}</li>
+    {% empty %}
+        <li>No recent dislikes.</li>
+    {% endfor %}
+</ul>
+
+<h3>Recent Discoveries</h3>
+<ul>
+    {% for item in short_term_preferences.recent_discoveries %}
+        <li>{{ item }}</li>
+    {% empty %}
+        <li>No recent discoveries.</li>
+    {% endfor %}
+</ul>
+
+<h3>Recent Hobbies</h3>
+<ul>
+    {% for item in short_term_preferences.recent_hobbies %}
+        <li>{{ item }}</li>
+    {% empty %}
+        <li>No recent hobbies.</li>
+    {% endfor %}
+</ul>
+
+<hr>
+
+<h2>Biases</h2>
+<ul>
+    {% for key, value in biases.items %}
+        <li><strong>{{ key }}:</strong> {{ value }}</li>
+    {% empty %}
+        <li>No bias data available.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

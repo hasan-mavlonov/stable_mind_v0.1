@@ -1,0 +1,63 @@
+{% extends "ui/base.html" %}
+
+{% block content %}
+<h1>Memory Viewer</h1>
+<p>This page shows the current JSONL-based memory logs.</p>
+
+<hr>
+
+<h2>Perceptions</h2>
+{% if perceptions %}
+    <ul>
+        {% for item in perceptions %}
+            <li><pre>{{ item }}</pre></li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No perceptions yet.</p>
+{% endif %}
+
+<h2>Perception Buffer</h2>
+{% if perception_buffer %}
+    <ul>
+        {% for item in perception_buffer %}
+            <li><pre>{{ item }}</pre></li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No perception buffer entries yet.</p>
+{% endif %}
+
+<h2>Episodic Memory</h2>
+{% if episodic %}
+    <ul>
+        {% for item in episodic %}
+            <li><pre>{{ item }}</pre></li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No episodic memory yet.</p>
+{% endif %}
+
+<h2>Consolidation Log</h2>
+{% if consolidation_log %}
+    <ul>
+        {% for item in consolidation_log %}
+            <li><pre>{{ item }}</pre></li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No consolidation logs yet.</p>
+{% endif %}
+
+<h2>Reflection Log</h2>
+{% if reflection_log %}
+    <ul>
+        {% for item in reflection_log %}
+            <li><pre>{{ item }}</pre></li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No reflection logs yet.</p>
+{% endif %}
+{% endblock %}

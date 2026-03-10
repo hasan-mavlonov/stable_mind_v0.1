@@ -3,21 +3,58 @@ from __future__ import annotations
 
 import argparse
 import json
-import sys
+from typing import Any, Dict
 
 from core.agent import Agent
 
 
-def main() -> None:
+def run_interactive_test_step(
+    user_text: str,
+    root: str = ".",
+    model: str = "gpt-4.1-mini",
+    session_id: str = "cli",
+) -> Dict[str, Any]:
+    """
+    Run one StableMind interactive test step and return structured output.
+    """
+    cleaned_text = (user_text or "").strip()
+    if not cleaned_text:
+        return {
+            "input": "",
+            "turn": None,
+            "perceived_entities": [],
+            "buffer_size": 0,
+            "did_ruminate": False,
+            "beliefs": {},
+            "error": "Empty input.",
+        }
+
+    agent = Agent(root_dir=root, model=model)
+    out = agent.step(cleaned_text, session_id=session_id)
+
+    return {
+        "input": cleaned_text,
+        "turn": out.get("turn"),
+        "perceived_entities": out.get("perceived_entities", []),
+        "buffer_size": out.get("buffer_size"),
+        "did_ruminate": out.get("did_ruminate"),
+        "beliefs": out.get("beliefs", {}),
+        "raw_output": out,
+    }
+
+
+def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Interactive StableMind test CLI")
     parser.add_argument("--root", type=str, default=".", help="Project root directory")
     parser.add_argument("--model", type=str, default="gpt-4.1-mini", help="OpenAI model name")
     parser.add_argument("--session", type=str, default="cli", help="Session id")
     parser.add_argument("--show-beliefs", action="store_true", help="Print beliefs each turn")
     parser.add_argument("--pretty", action="store_true", help="Pretty-print JSON")
-    args = parser.parse_args()
+    return parser.parse_args()
 
-    a = Agent(root_dir=args.root, model=args.model)
+
+def main() -> None:
+    args = parse_args()
 
     print("StableMind interactive test")
     print("Type a message and press Enter.")
@@ -47,23 +84,27 @@ def main() -> None:
             print("  --pretty        - pretty-print JSON output")
             continue
 
-        out = a.step(text, session_id=args.session)
+        result = run_interactive_test_step(
+            user_text=text,
+            root=args.root,
+            model=args.model,
+            session_id=args.session,
+        )
 
-        # Print summary like stress_test
-        print(f"\nTURN: {out.get('turn')}")
-        print(f"INPUT: {text}")
+        print(f"\nTURN: {result.get('turn')}")
+        print(f"INPUT: {result.get('input')}")
 
-        perceived = out.get("perceived_entities", [])
+        perceived = result.get("perceived_entities", [])
         if args.pretty:
             print("PERCEIVED:", json.dumps(perceived, indent=2, ensure_ascii=False))
         else:
             print("PERCEIVED:", perceived)
 
-        print(f"BUFFER_SIZE: {out.get('buffer_size')}")
-        print(f"DID_RUMINATE: {out.get('did_ruminate')}")
+        print(f"BUFFER_SIZE: {result.get('buffer_size')}")
+        print(f"DID_RUMINATE: {result.get('did_ruminate')}")
 
         if args.show_beliefs:
-            beliefs = out.get("beliefs", {})
+            beliefs = result.get("beliefs", {})
             if args.pretty:
                 print("BELIEFS:", json.dumps(beliefs, indent=2, ensure_ascii=False))
             else:

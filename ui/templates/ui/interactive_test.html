@@ -1,0 +1,48 @@
+{% extends "ui/base.html" %}
+
+{% block content %}
+<h1>Interactive Test</h1>
+<p>Run one StableMind step and inspect the internal result.</p>
+
+<form method="post">
+    {% csrf_token %}
+    <textarea name="message" rows="5" cols="70" placeholder="Type a test input...">{% if user_text %}{{ user_text }}{% endif %}</textarea>
+    <br><br>
+    <button type="submit">Run Test Step</button>
+</form>
+
+{% if error %}
+    <hr>
+    <p><strong>{{ error }}</strong></p>
+{% endif %}
+
+{% if result %}
+    <hr>
+
+    <h2>Summary</h2>
+    <p><strong>Turn:</strong> {{ result.turn }}</p>
+    <p><strong>Input:</strong> {{ result.input }}</p>
+    <p><strong>Buffer Size:</strong> {{ result.buffer_size }}</p>
+    <p><strong>Did Ruminate:</strong> {{ result.did_ruminate }}</p>
+
+    <h2>Perceived Entities</h2>
+    {% if result.perceived_entities %}
+        <ul>
+            {% for item in result.perceived_entities %}
+                <li>
+                    <pre>{{ item }}</pre>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No perceived entities.</p>
+    {% endif %}
+
+    <h2>Beliefs</h2>
+    {% if result.beliefs %}
+        <pre>{{ result.beliefs }}</pre>
+    {% else %}
+        <p>No beliefs returned for this step.</p>
+    {% endif %}
+{% endif %}
+{% endblock %}

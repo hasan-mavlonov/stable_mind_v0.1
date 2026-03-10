@@ -1,0 +1,5 @@
+{"turn": 1, "session_id": "web", "user_text": "I think the weather is shitty today", "entities": [{"entity_type": "concept", "entity": "weather", "dimension_values": {"valence": -0.8}, "confidence": 0.9}]}
+{"turn": 2, "session_id": "web", "user_text": "My mom is emotionally unstable", "entities": [{"entity_type": "person", "entity": "mom", "dimension_values": {"emotional_stability": -0.8}, "confidence": 0.9}]}
+{"turn": 3, "session_id": "web", "user_text": "I think my dog is ugly", "entities": [{"entity_type": "concept", "entity": "dog", "dimension_values": {"valence": -0.7}, "confidence": 0.9}]}
+{"turn": 4, "session_id": "web", "user_text": "My dad beats me every day", "entities": [{"entity_type": "person", "entity": "dad", "dimension_values": {"warmth": -0.9}, "confidence": 0.95}, {"entity_type": "self_state", "entity": "self", "dimension_values": {"stress": 0.9}, "confidence": 0.95}]}
+{"turn": 5, "session_id": "web", "user_text": "My shoes keep being wet after the rain", "entities": []}
