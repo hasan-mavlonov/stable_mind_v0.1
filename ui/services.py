@@ -5,6 +5,7 @@ from create_persona import create_persona
 from talk import answer_user_message
 from interactive_test import run_interactive_test_step
 
+
 def run_create_persona() -> None:
     project_root = Path(__file__).resolve().parent.parent
     create_persona(project_root)
@@ -18,7 +19,11 @@ def run_talk(user_text: str) -> str:
 def read_json_file(path: Path) -> dict:
     if not path.exists():
         return {}
-    return json.loads(path.read_text(encoding="utf-8"))
+
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {"_error": f"Invalid JSON in {path.name}"}
 
 
 def read_jsonl_file(path: Path) -> list[dict]:
@@ -66,6 +71,7 @@ def get_memory_data() -> dict:
         "consolidation_log": read_jsonl_file(memory_dir / "consolidation_log.jsonl"),
         "reflection_log": read_jsonl_file(memory_dir / "reflection_log.jsonl"),
     }
+
 
 def run_interactive_test(user_text: str) -> dict:
     project_root = Path(__file__).resolve().parent.parent

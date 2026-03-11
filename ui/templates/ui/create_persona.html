@@ -1,15 +1,21 @@
 {% extends "ui/base.html" %}
 
 {% block content %}
-<h1>Create Persona</h1>
-<p>This will reset and initialize the persona, state, and memory files.</p>
+<section class="mx-auto max-w-2xl rounded-2xl border border-slate-800 bg-slate-900 p-8">
+    <h1 class="text-2xl font-bold">Create Persona</h1>
+    <p class="mt-2 text-slate-300">This action reinitializes persona, state, and memory files.</p>
 
-{% if success_message %}
-    <p>{{ success_message }}</p>
-{% endif %}
+    {% if success_message %}
+        <div class="mt-4 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-emerald-300">{{ success_message }}</div>
+    {% endif %}
 
-<form method="post">
-    {% csrf_token %}
-    <button type="submit">Initialize Fresh Persona</button>
-</form>
+    {% if error_message %}
+        <div class="mt-4 rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-rose-300">{{ error_message }}</div>
+    {% endif %}
+
+    <form method="post" class="mt-6">
+        {% csrf_token %}
+        <button class="rounded-lg bg-cyan-500 px-4 py-2 font-semibold text-slate-950 hover:bg-cyan-400" type="submit">Initialize Fresh Persona</button>
+    </form>
+</section>
 {% endblock %}

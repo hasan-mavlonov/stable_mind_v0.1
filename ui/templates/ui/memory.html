@@ -1,63 +1,37 @@
 {% extends "ui/base.html" %}
 
 {% block content %}
-<h1>Memory Viewer</h1>
-<p>This page shows the current JSONL-based memory logs.</p>
+<section class="space-y-6">
+    <div>
+        <h1 class="text-3xl font-bold">Memory Viewer</h1>
+        <p class="mt-2 text-slate-300">JSONL-based memory logs used by StableMind.</p>
+    </div>
 
-<hr>
+    <div class="space-y-4">
+        <article class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+            <h2 class="font-semibold text-cyan-300">Perceptions</h2>
+            <pre class="mt-3 overflow-x-auto rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm">{{ perceptions|pprint }}</pre>
+        </article>
 
-<h2>Perceptions</h2>
-{% if perceptions %}
-    <ul>
-        {% for item in perceptions %}
-            <li><pre>{{ item }}</pre></li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>No perceptions yet.</p>
-{% endif %}
+        <article class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+            <h2 class="font-semibold text-cyan-300">Perception Buffer</h2>
+            <pre class="mt-3 overflow-x-auto rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm">{{ perception_buffer|pprint }}</pre>
+        </article>
 
-<h2>Perception Buffer</h2>
-{% if perception_buffer %}
-    <ul>
-        {% for item in perception_buffer %}
-            <li><pre>{{ item }}</pre></li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>No perception buffer entries yet.</p>
-{% endif %}
+        <article class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+            <h2 class="font-semibold text-cyan-300">Episodic</h2>
+            <pre class="mt-3 overflow-x-auto rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm">{{ episodic|pprint }}</pre>
+        </article>
 
-<h2>Episodic Memory</h2>
-{% if episodic %}
-    <ul>
-        {% for item in episodic %}
-            <li><pre>{{ item }}</pre></li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>No episodic memory yet.</p>
-{% endif %}
+        <article class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+            <h2 class="font-semibold text-cyan-300">Consolidation Log</h2>
+            <pre class="mt-3 overflow-x-auto rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm">{{ consolidation_log|pprint }}</pre>
+        </article>
 
-<h2>Consolidation Log</h2>
-{% if consolidation_log %}
-    <ul>
-        {% for item in consolidation_log %}
-            <li><pre>{{ item }}</pre></li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>No consolidation logs yet.</p>
-{% endif %}
-
-<h2>Reflection Log</h2>
-{% if reflection_log %}
-    <ul>
-        {% for item in reflection_log %}
-            <li><pre>{{ item }}</pre></li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>No reflection logs yet.</p>
-{% endif %}
+        <article class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+            <h2 class="font-semibold text-cyan-300">Reflection Log</h2>
+            <pre class="mt-3 overflow-x-auto rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm">{{ reflection_log|pprint }}</pre>
+        </article>
+    </div>
+</section>
 {% endblock %}
