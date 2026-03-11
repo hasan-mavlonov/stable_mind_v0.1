@@ -1,0 +1,137 @@
+{
+	"name": "preline",
+	"version": "4.1.2",
+	"description": "Preline UI is an open-source set of prebuilt UI components based on the utility-first Tailwind CSS framework.",
+	"main": "./dist/index.js",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.mjs",
+			"require": "./dist/index.js"
+		},
+		"./non-auto": {
+			"types": "./dist/non-auto.d.ts",
+			"import": "./dist/non-auto.mjs",
+			"require": "./dist/non-auto.js"
+		},
+		"./plugins/*": {
+			"types": "./dist/*.d.ts",
+			"import": "./dist/*.mjs",
+			"require": "./dist/*.js"
+		},
+		"./helpers/*": {
+			"types": "./dist/helper-*.d.ts",
+			"import": "./dist/helper-*.mjs",
+			"require": "./dist/helper-*.js"
+		},
+		"./utils": {
+			"types": "./dist/utils.d.ts",
+			"import": "./dist/utils.mjs",
+			"require": "./dist/utils.js"
+		},
+		"./package.json": "./package.json"
+	},
+	"sideEffects": [
+		"./dist/index.js",
+		"./dist/index.mjs",
+		"./dist/helper-clipboard.js",
+		"./dist/helper-clipboard.mjs"
+	],
+	"bin": {
+		"preline-theme-generator": "./skills/theme-generator/scripts/generate-theme.js"
+	},
+	"repository": "https://github.com/htmlstreamofficial/preline.git",
+	"homepage": "https://preline.co",
+	"keywords": [
+		"preline",
+		"html",
+		"css",
+		"javascript",
+		"typescript",
+		"webpack",
+		"agent skills",
+		"tailwind",
+		"tailwind css",
+		"tailwind ui",
+		"tailwind library",
+		"tailwind examples",
+		"tailwind templates",
+		"tailwind plugins",
+		"tailwind components",
+		"tailwind components library",
+		"tailwind elements",
+		"tailwind sections",
+		"tailwind blocks",
+		"tailwind colors",
+		"tailwind css react",
+		"tailwind css next",
+		"tailwind css nextjs",
+		"tailwind css vue",
+		"tailwind css nuxtjs",
+		"tailwind css angular",
+		"tailwind css astro",
+		"tailwind css solidjs",
+		"tailwind css qwik",
+		"tailwind css svelte",
+		"tailwind css remix",
+		"tailwind css laravel",
+		"tailwind css vite",
+		"tailwind css hugo",
+		"tailwind css adonis",
+		"tailwind css adonisjs",
+		"tailwind css livewire",
+		"tailwind css symfony",
+		"tailwind css rails",
+		"tailwind css phoenix",
+		"tailwind css phoenix liveview",
+		"tailwind css ember",
+		"tailwind css flask",
+		"tailwind css django",
+		"tailwind css express",
+		"tailwind css blazor",
+		"tailwind css aspnet",
+		"tailwind css asp.net core",
+		"theme generator",
+		"preline theme generator"
+	],
+	"author": "Preline Labs Ltd.",
+	"license": "Licensed under MIT and Preline UI Fair Use License",
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"watch": "webpack --config webpack.config.js --watch",
+		"watch:mjs": "webpack --config webpack.config.mjs.js --watch",
+		"build:js": "webpack --config webpack.config.js",
+		"build:mjs": "webpack --config webpack.config.mjs.js",
+		"build": "npm run build:js && npm run build:mjs && npm run generate-dts",
+		"pretty": "prettier --write --cache \"./**/*.{js,jsx,ts,tsx,json}\"",
+		"generate-dts": "tsc -p tsconfig.dts.json && node ./scripts/flatten-dts.js"
+	},
+	"dependencies": {
+		"@floating-ui/dom": "^1.6.13",
+		"@types/culori": "^4.0.1",
+		"apexcharts": "^4.5.0",
+		"culori": "^4.0.2",
+		"datatables.net-dt": "^2.2.2",
+		"dropzone": "^6.0.0-beta.2",
+		"nouislider": "^15.8.1",
+		"vanilla-calendar-pro": "^3.0.4"
+	},
+	"devDependencies": {
+		"@types/dropzone": "5.7.9",
+		"@types/jquery": "^3.5.30",
+		"@types/lodash": "^4.17.6",
+		"@types/prismjs": "^1.26.4",
+		"@types/vinyl": "^2.0.12",
+		"dts-bundle-generator": "^9.0.0",
+		"prettier": "^3.0.1",
+		"source-map-loader": "^4.0.1",
+		"terser-webpack-plugin": "^5.3.9",
+		"ts-loader": "^9.5.1",
+		"typescript": "^5.5.3",
+		"webpack-cli": "^5.1.4"
+	}
+}
