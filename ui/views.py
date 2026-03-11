@@ -16,8 +16,11 @@ def create_persona_view(request):
     context = {}
 
     if request.method == "POST":
-        run_create_persona()
-        context["success_message"] = "Persona was initialized successfully."
+        try:
+            run_create_persona()
+            context["success_message"] = "Persona was initialized successfully."
+        except Exception as exc:
+            context["error_message"] = f"Persona initialization failed: {exc}"
 
     return render(request, "ui/create_persona.html", context)
 
@@ -30,9 +33,12 @@ def talk_view(request):
         context["user_text"] = user_text
 
         if user_text:
-            context["answer"] = run_talk(user_text)
+            try:
+                context["answer"] = run_talk(user_text)
+            except Exception as exc:
+                context["error"] = f"Unable to generate response: {exc}"
         else:
-            context["answer"] = "Please enter a message."
+            context["error"] = "Please enter a message."
 
     return render(request, "ui/talk.html", context)
 
@@ -45,8 +51,11 @@ def interactive_test_view(request):
         context["user_text"] = user_text
 
         if user_text:
-            result = run_interactive_test(user_text)
-            context["result"] = result
+            try:
+                result = run_interactive_test(user_text)
+                context["result"] = result
+            except Exception as exc:
+                context["error"] = f"Interactive test failed: {exc}"
         else:
             context["error"] = "Please enter a message."
 

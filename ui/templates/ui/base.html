@@ -1,22 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full bg-slate-950">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StableMind UI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <nav>
-        <a href="/">Home</a> |
-        <a href="/create-persona/">Create Persona</a> |
-        <a href="/talk/">Talk</a> |
-        <a href="/interactive-test/">Interactive Test</a> |
-        <a href="/persona/">Persona</a> |
-        <a href="/memory/">Memory</a>
-    </nav>
+<body class="h-full text-slate-100">
+    <div class="min-h-full">
+        <header class="sticky top-0 z-30 border-b border-slate-800 bg-slate-950/95 backdrop-blur">
+            <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+                <a href="/" class="text-lg font-semibold tracking-tight text-cyan-300">StableMind</a>
+                <nav class="flex flex-wrap items-center gap-2 text-sm">
+                    <a class="rounded-md px-3 py-1.5 hover:bg-slate-800" href="/">Home</a>
+                    <a class="rounded-md px-3 py-1.5 hover:bg-slate-800" href="/create-persona/">Create Persona</a>
+                    <a class="rounded-md px-3 py-1.5 hover:bg-slate-800" href="/talk/">Talk</a>
+                    <a class="rounded-md px-3 py-1.5 hover:bg-slate-800" href="/interactive-test/">Interactive Test</a>
+                    <a class="rounded-md px-3 py-1.5 hover:bg-slate-800" href="/persona/">Persona</a>
+                    <a class="rounded-md px-3 py-1.5 hover:bg-slate-800" href="/memory/">Memory</a>
+                </nav>
+            </div>
+        </header>
 
-    <hr>
-
-    {% block content %}{% endblock %}
+        <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
 </body>
 </html>

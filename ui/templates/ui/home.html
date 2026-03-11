@@ -1,6 +1,32 @@
 {% extends "ui/base.html" %}
 
 {% block content %}
-<h1>StableMind</h1>
-<p>Welcome to the StableMind local interface.</p>
+<section class="rounded-2xl border border-slate-800 bg-slate-900 p-8 shadow-xl shadow-cyan-950/20">
+    <p class="text-sm uppercase tracking-[0.2em] text-cyan-300">Local dashboard</p>
+    <h1 class="mt-2 text-4xl font-bold tracking-tight">StableMind Control Center</h1>
+    <p class="mt-4 max-w-2xl text-slate-300">Use this interface to initialize a persona, chat, run single-step tests, and inspect memory/persona state in real time.</p>
+
+    <div class="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <a href="/create-persona/" class="rounded-xl border border-slate-700 bg-slate-800 p-4 hover:border-cyan-400">
+            <h2 class="font-semibold">Create Persona</h2>
+            <p class="mt-1 text-sm text-slate-300">Reset and initialize persona + memory files.</p>
+        </a>
+        <a href="/talk/" class="rounded-xl border border-slate-700 bg-slate-800 p-4 hover:border-cyan-400">
+            <h2 class="font-semibold">Talk</h2>
+            <p class="mt-1 text-sm text-slate-300">Send direct prompts and get responses from Rin.</p>
+        </a>
+        <a href="/interactive-test/" class="rounded-xl border border-slate-700 bg-slate-800 p-4 hover:border-cyan-400">
+            <h2 class="font-semibold">Interactive Test</h2>
+            <p class="mt-1 text-sm text-slate-300">Run a single engine step and inspect internals.</p>
+        </a>
+        <a href="/persona/" class="rounded-xl border border-slate-700 bg-slate-800 p-4 hover:border-cyan-400">
+            <h2 class="font-semibold">Persona Viewer</h2>
+            <p class="mt-1 text-sm text-slate-300">Explore immutable, stable, and dynamic persona data.</p>
+        </a>
+        <a href="/memory/" class="rounded-xl border border-slate-700 bg-slate-800 p-4 hover:border-cyan-400">
+            <h2 class="font-semibold">Memory Viewer</h2>
+            <p class="mt-1 text-sm text-slate-300">Inspect JSONL logs for perceptions and reflection.</p>
+        </a>
+    </div>
+</section>
 {% endblock %}
