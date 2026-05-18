@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="MindForm — the personality layer for AI agents. Behavioral continuity, evolving identity, and emotional persistence for robots, NPCs, companions, and anything that needs to feel like someone. Built on Gemma." />
+<meta name="keywords" content="MindForm, AI personality, behavioral continuity, persistent identity, AI agents, Gemma, Google AI" />
+<meta property="og:title" content="MindForm — The personality layer for AI agents" />
+<meta property="og:description" content="Memory alone isn't enough. MindForm gives AI agents behavioral continuity, a persistent identity, and emotional persistence — powered by Gemma." />
+<meta property="og:type" content="website" />
+<meta name="theme-color" content="#0E0820" />
+<title>MindForm — The personality layer for AI agents</title>
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231A0E2E'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23F0386B'/%3E%3C/svg%3E" />
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem('theme');
+      if (t !== 'dark' && t !== 'light') {
+        t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,300;1,6..72,400&family=JetBrains+Mono:wght@300;400;500&family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500&display=swap" rel="stylesheet" />
+
+<style>
+:root {
+  --bone: #FAF7F1; --bone-2: #F2EDE3; --bone-3: #E6DECD;
+  --ink: #1A0E2E; --ink-2: #2E1F4A;
+  --muted: #8B7BA0; --muted-2: #6A597F;
+  --hairline: rgba(26, 14, 46, 0.10);
+  --belief: #F0386B; --belief-soft: #FF6F94; --belief-tint: rgba(240, 56, 107, 0.10);
+  --trait: #5B3FE0; --trait-soft: #9A7FFF; --trait-tint: rgba(91, 63, 224, 0.08);
+  --honey: #F5B341;
+  --surface-card: #ffffff;
+  --surface-inverted: #1A0E2E;
+  --on-inverted: #FAF7F1;
+  --nav-fade: rgba(244,236,222,0);
+  --hero-cap-bg: rgba(250,247,241,0.85);
+  --serif-display: "Instrument Serif", "Newsreader", Georgia, serif;
+  --serif-body: "Newsreader", Georgia, "Times New Roman", serif;
+  --sans-display: "Bricolage Grotesque", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: light;
+}
+[data-theme="dark"] {
+  --bone: #0E0820; --bone-2: #161029; --bone-3: #221638;
+  --ink: #F2EAD6; --ink-2: #C9C0AA;
+  --muted: #9B8DB0; --muted-2: #B5A8C7;
+  --hairline: rgba(242,234,214,0.12);
+  --belief-tint: rgba(240, 56, 107, 0.18);
+  --surface-card: #16102B;
+  --surface-inverted: #06010E;
+  --on-inverted: #F2EAD6;
+  --nav-fade: rgba(14,8,32,0);
+  --hero-cap-bg: rgba(14,8,32,0.85);
+  color-scheme: dark;
+}
+html { transition: background-color 0.25s ease, color 0.25s ease; }
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--bone); color: var(--ink); font-family: var(--serif-body); font-weight: 400; font-size: 18px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+body { overflow-x: hidden; }
+::selection { background: var(--ink); color: var(--bone); }
+a { color: inherit; text-decoration: none; }
+.eyebrow { font-family: var(--mono); font-size: 11px; font-weight: 400; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted-2); }
+.eyebrow-strong { font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink); }
+h1, h2, h3, h4 { font-family: var(--serif-display); font-weight: 400; letter-spacing: -0.01em; line-height: 0.98; margin: 0; }
+.display { font-family: var(--serif-display); font-weight: 400; line-height: 0.96; letter-spacing: -0.018em; }
+em, .italic { font-style: italic; }
+p { margin: 0; }
+.body-lg { font-size: 22px; line-height: 1.5; font-weight: 400; }
+.container { width: 100%; max-width: 1400px; margin: 0 auto; padding: 0 48px; }
+.section { padding: 140px 0; position: relative; }
+.btn { display: inline-flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; padding: 14px 22px; border-radius: 999px; border: 1px solid var(--ink); cursor: pointer; background: transparent; color: var(--ink); transition: background 0.2s ease, color 0.2s ease; white-space: nowrap; }
+.btn:hover { background: var(--ink); color: var(--bone); }
+.btn-primary { background: var(--ink); color: var(--bone); }
+.btn-primary:hover { background: var(--belief); border-color: var(--belief); color: #fff; }
+.btn-ghost { border-color: transparent; padding-left: 6px; padding-right: 6px; }
+.btn-ghost:hover { background: transparent; color: var(--belief); }
+
+/* Nav */
+.nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 24px 48px; pointer-events: none; }
+.nav > * { pointer-events: auto; }
+.nav-bg { position: absolute; inset: 0; background: linear-gradient(to bottom, var(--bone) 30%, var(--nav-fade)); opacity: 0; transition: opacity 0.3s ease; pointer-events: none; z-index: -1; }
+.nav.is-scrolled .nav-bg { opacity: 1; }
+.wordmark { font-family: var(--serif-display); font-size: 26px; letter-spacing: -0.01em; display: inline-flex; align-items: center; gap: 10px; }
+.wordmark-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--belief); display: inline-block; margin-bottom: 2px; box-shadow: 0 0 10px var(--belief); }
+.nav-links { display: flex; gap: 36px; align-items: center; font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; }
+.nav-links a { color: var(--ink); opacity: 0.7; transition: opacity 0.2s; }
+.nav-links a:hover { opacity: 1; }
+
+/* Hero */
+.hero { min-height: 100vh; padding-top: 110px; padding-bottom: 80px; position: relative; display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
+.hero-grid { display: grid; grid-template-columns: 0.95fr 1.05fr; gap: 56px; align-items: center; min-height: calc(100vh - 200px); }
+.hero-content { display: flex; flex-direction: column; gap: 32px; }
+.hero-eyebrow { display: inline-flex; align-items: center; gap: 12px; }
+.hero-eyebrow-dot { width: 6px; height: 6px; background: var(--belief); border-radius: 50%; animation: pulse 2.2s ease-in-out infinite; box-shadow: 0 0 12px var(--belief); }
+@keyframes pulse { 0%, 100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.3); } }
+.hero-title { font-size: clamp(40px, 5.5vw, 84px); line-height: 0.96; letter-spacing: -0.025em; font-weight: 400; }
+.hero-title .accent { color: var(--belief); font-style: italic; }
+.hero-title em { color: var(--trait); font-style: italic; }
+.hero-sub { font-size: 20px; line-height: 1.45; color: var(--ink-2); max-width: 480px; }
+.hero-sub strong { font-weight: 500; color: var(--ink); }
+.hero-cta-row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.hero-visual { position: relative; width: 100%; height: 100%; min-height: 620px; display: flex; align-items: center; justify-content: center; }
+.hero-mind { position: relative; width: 100%; height: 100%; min-height: 620px; }
+.hero-mind-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.hero-mind-canvas canvas { display: block; width: 100% !important; height: 100% !important; }
+.hero-mind-caption { position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 22px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted-2); white-space: nowrap; z-index: 2; background: var(--hero-cap-bg); backdrop-filter: blur(6px); padding: 8px 16px; border: 1px solid var(--hairline); border-radius: 999px; }
+.hero-mind-caption .dot { width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; display: inline-block; vertical-align: middle; }
+.hero-mind-caption .dot-belief { background: var(--belief); box-shadow: 0 0 8px var(--belief); }
+.hero-mind-caption .dot-trait  { background: var(--trait-soft); box-shadow: 0 0 6px var(--trait-soft); }
+.hero-meta { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; color: var(--muted-2); padding-top: 22px; margin-top: 4px; border-top: 1px dashed var(--hairline); }
+.hero-meta .k { color: var(--belief); margin-right: 12px; text-transform: uppercase; letter-spacing: 0.16em; }
+.powered { display: inline-flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted-2); border: 1px solid var(--hairline); border-radius: 999px; padding: 7px 14px; width: max-content; }
+.powered b { color: var(--ink); font-weight: 500; }
+.powered .gem { width: 8px; height: 8px; border-radius: 2px; transform: rotate(45deg); background: linear-gradient(135deg, var(--belief), var(--trait-soft)); }
+
+/* Problem */
+.problem { background: var(--surface-inverted); color: var(--on-inverted); padding: 160px 0; }
+.problem .container { color: var(--on-inverted); }
+.problem .eyebrow { color: rgba(244,236,222,0.5); }
+.problem-title { font-size: clamp(48px, 7vw, 110px); line-height: 0.95; letter-spacing: -0.02em; margin-bottom: 60px; max-width: 1100px; }
+.problem-title .drift { color: var(--belief-soft); font-style: italic; }
+.drift-demo { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 28px; margin-bottom: 80px; }
+.drift-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 28px; }
+.drift-card-time { font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(244,236,222,0.4); margin-bottom: 18px; }
+.drift-quote { font-family: var(--serif-display); font-size: 28px; line-height: 1.15; letter-spacing: -0.01em; color: var(--on-inverted); }
+.drift-card-3 .drift-quote { color: var(--belief-soft); font-style: italic; }
+.drift-arrow { display: flex; justify-content: center; align-items: center; font-family: var(--mono); font-size: 11px; color: rgba(244,236,222,0.4); letter-spacing: 0.18em; margin: -20px 0 28px; }
+.failure-modes { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; border-top: 1px solid rgba(255,255,255,0.14); padding-top: 60px; }
+.failure-mode-num { font-family: var(--mono); font-size: 12px; letter-spacing: 0.16em; color: var(--belief-soft); margin-bottom: 16px; }
+.failure-mode-title { font-family: var(--serif-display); font-style: italic; font-size: 40px; line-height: 1; margin-bottom: 20px; }
+.failure-mode-body { color: rgba(244,236,222,0.7); font-size: 18px; line-height: 1.55; max-width: 460px; }
+
+/* Pillars */
+.pillars-title { font-size: clamp(44px, 6vw, 92px); line-height: 0.95; letter-spacing: -0.02em; margin-bottom: 24px; max-width: 1000px; }
+.pillars-title em { color: var(--belief); font-style: italic; }
+.pillars-lead { font-size: 20px; line-height: 1.5; color: var(--ink-2); max-width: 660px; margin-bottom: 90px; }
+.pillars-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0; border-top: 1px solid var(--hairline); border-left: 1px solid var(--hairline); }
+.pillar { border-right: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); padding: 44px 44px 52px; display: flex; flex-direction: column; gap: 16px; min-height: 280px; transition: background 0.3s; }
+.pillar:hover { background: rgba(240,56,107,0.035); }
+.pillar-num { font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; color: var(--belief); }
+.pillar-h { font-family: var(--serif-display); font-size: 40px; line-height: 1.02; letter-spacing: -0.01em; }
+.pillar-h em { font-style: italic; color: var(--trait); }
+.pillar-body { font-size: 17px; line-height: 1.55; color: var(--ink-2); margin-top: auto; }
+
+/* Demo */
+.demo-section { background: var(--surface-inverted); color: var(--on-inverted); padding: 160px 0; position: relative; overflow: hidden; }
+.demo-section .eyebrow { color: rgba(244,236,222,0.5); }
+.demo-title { font-size: clamp(44px, 6vw, 88px); line-height: 0.95; letter-spacing: -0.02em; margin-bottom: 24px; max-width: 900px; }
+.demo-title em { color: var(--belief-soft); font-style: italic; }
+.demo-lead { font-size: 20px; line-height: 1.5; color: rgba(244,236,222,0.65); max-width: 640px; margin-bottom: 70px; }
+.demo-stage { display: grid; grid-template-columns: 1.05fr 1.2fr; gap: 32px; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; background: rgba(255,255,255,0.02); padding: 0; min-height: 560px; position: relative; overflow: hidden; }
+.demo-chat { padding: 32px 32px 24px; border-right: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; position: relative; min-height: 100%; }
+.demo-chat-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.demo-chat-label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(244,236,222,0.5); }
+.demo-chat-turn { font-family: var(--mono); font-size: 11px; color: var(--belief-soft); letter-spacing: 0.12em; white-space: nowrap; }
+.demo-msgs { flex: 1; display: flex; flex-direction: column; gap: 14px; overflow: hidden; position: relative; }
+.demo-msg { font-family: var(--serif-display); font-size: 22px; line-height: 1.25; letter-spacing: -0.005em; opacity: 0; transform: translateY(8px); transition: opacity 0.4s, transform 0.4s; padding-left: 16px; border-left: 2px solid rgba(255,255,255,0.18); }
+.demo-msg.is-shown { opacity: 1; transform: translateY(0); }
+.demo-msg .author { display: block; font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(244,236,222,0.4); margin-bottom: 6px; font-style: normal; }
+.demo-msg.user .author { color: var(--belief-soft); }
+.demo-msg.agent { border-left-color: var(--belief-soft); }
+.demo-msg.agent .author { color: rgba(244,236,222,0.55); }
+.demo-perception { position: absolute; bottom: 24px; left: 32px; right: 32px; padding: 14px 16px; border: 1px dashed var(--belief-soft); border-radius: 6px; background: rgba(240,56,107,0.08); font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em; color: var(--belief-soft); opacity: 0; transition: opacity 0.3s; display: flex; justify-content: space-between; align-items: center; }
+.demo-perception.is-shown { opacity: 1; }
+.demo-state { padding: 32px; display: flex; flex-direction: column; gap: 28px; min-height: 100%; }
+.demo-panel-h { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 10px; }
+.demo-panel-h .label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(244,236,222,0.5); white-space: nowrap; }
+.demo-panel-h .label .glyph { text-transform: none; font-style: italic; font-family: var(--serif-display); font-size: 14px; margin-left: 4px; letter-spacing: 0; color: rgba(244,236,222,0.75); }
+.demo-panel-h .badge { font-family: var(--mono); font-size: 10px; padding: 3px 8px; border-radius: 3px; letter-spacing: 0.14em; white-space: nowrap; }
+.demo-panel-h .badge.fast { background: rgba(240,56,107,0.18); color: var(--belief-soft); }
+.demo-panel-h .badge.slow { background: rgba(91,63,224,0.32); color: #B8A6FF; }
+.belief-bars { display: flex; flex-direction: column; gap: 10px; }
+.belief-row { display: grid; grid-template-columns: 130px 1fr 60px; align-items: center; gap: 14px; }
+.belief-name { font-family: var(--mono); font-size: 11px; color: rgba(244,236,222,0.65); }
+.belief-track { position: relative; height: 10px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
+.belief-track::before { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: rgba(255,255,255,0.18); }
+.belief-fill { position: absolute; left: 50%; top: 0; bottom: 0; background: var(--belief-soft); transition: width 0.6s cubic-bezier(.4,0,.2,1), left 0.6s cubic-bezier(.4,0,.2,1); border-radius: 2px; }
+.belief-baseline { position: absolute; top: -2px; bottom: -2px; width: 2px; background: rgba(255,255,255,0.55); }
+.belief-val { font-family: var(--mono); font-size: 11px; color: rgba(244,236,222,0.8); text-align: right; }
+.trait-bars { display: flex; flex-direction: column; gap: 10px; }
+.trait-row { display: grid; grid-template-columns: 130px 1fr 60px; align-items: center; gap: 14px; }
+.trait-track { position: relative; height: 10px; background: rgba(255,255,255,0.05); border-radius: 2px; overflow: hidden; }
+.trait-fill { position: absolute; left: 50%; top: 0; bottom: 0; background: #B8A6FF; transition: width 1s cubic-bezier(.4,0,.2,1), left 1s cubic-bezier(.4,0,.2,1); border-radius: 2px; }
+.trait-pulse { position: absolute; inset: -3px; border: 1px solid var(--belief-soft); border-radius: 4px; opacity: 0; pointer-events: none; }
+.trait-pulse.is-on { animation: pulse-trait 0.8s ease-out; }
+@keyframes pulse-trait { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.08); } }
+.reflection-banner { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: rgba(240,56,107,0.14); border: 1px solid rgba(240,56,107,0.5); border-radius: 6px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--belief-soft); opacity: 0; transition: opacity 0.3s; }
+.reflection-banner.is-on { opacity: 1; }
+.demo-controls { display: flex; align-items: center; gap: 16px; margin-top: 28px; font-family: var(--mono); font-size: 12px; color: rgba(244,236,222,0.5); letter-spacing: 0.12em; }
+.demo-btn { font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; padding: 10px 18px; border: 1px solid rgba(244,236,222,0.25); border-radius: 999px; background: transparent; color: var(--on-inverted); cursor: pointer; transition: background 0.2s, border-color 0.2s; }
+.demo-btn:hover { background: rgba(255,255,255,0.06); }
+
+/* Diagram */
+.diagram-section { background: var(--bone-2); position: relative; padding: 140px 0 0; }
+.diagram-header { margin-bottom: 60px; }
+.diagram-title { font-size: clamp(44px, 6vw, 88px); line-height: 0.95; letter-spacing: -0.02em; margin-bottom: 24px; max-width: 900px; }
+.diagram-title em { color: var(--belief); }
+.diagram-lead { font-size: 20px; line-height: 1.5; color: var(--ink-2); max-width: 640px; }
+.diagram-stage { position: relative; height: 600vh; }
+.diagram-sticky { position: sticky; top: 0; height: 100vh; display: grid; grid-template-columns: 380px 1fr; gap: 0; align-items: stretch; border-top: 1px solid var(--hairline); }
+.diagram-steps { border-right: 1px solid var(--hairline); padding: 80px 40px 80px 48px; display: flex; flex-direction: column; justify-content: center; gap: 6px; background: var(--bone-2); }
+.diagram-step { padding: 16px 18px; border-radius: 6px; cursor: default; transition: background 0.4s ease, opacity 0.4s ease; opacity: 0.35; border-left: 2px solid transparent; }
+.diagram-step.is-active { opacity: 1; background: rgba(26,14,46,0.04); border-left-color: var(--belief); }
+.diagram-step-n { font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted-2); margin-bottom: 6px; }
+.diagram-step-title { font-family: var(--serif-display); font-size: 22px; line-height: 1.1; letter-spacing: -0.005em; margin-bottom: 6px; }
+.diagram-step-desc { font-size: 14px; line-height: 1.45; color: var(--muted-2); }
+.diagram-canvas-wrap { position: relative; padding: 60px; display: flex; align-items: center; justify-content: center; background: var(--bone-2); overflow: hidden; }
+.diagram-canvas { position: relative; width: 100%; height: 100%; max-width: 760px; max-height: 600px; }
+
+/* Use Cases */
+.usecases-title { font-size: clamp(48px, 7vw, 110px); line-height: 0.95; letter-spacing: -0.02em; margin-bottom: 28px; max-width: 1100px; }
+.usecases-title em { color: var(--belief); font-style: italic; }
+.usecases-lead { font-size: 22px; line-height: 1.45; color: var(--ink-2); max-width: 660px; margin-bottom: 100px; }
+.usecases-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 1px solid var(--hairline); border-left: 1px solid var(--hairline); }
+.usecase { border-right: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); padding: 36px 36px 44px; display: flex; flex-direction: column; gap: 14px; min-height: 300px; position: relative; transition: background 0.3s; }
+.usecase:hover { background: rgba(26,14,46,0.025); }
+.usecase-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.usecase-num { font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; color: var(--muted-2); }
+.usecase-glyph { font-family: var(--serif-display); font-size: 26px; color: var(--belief); line-height: 1; }
+.usecase-h { font-family: var(--serif-display); font-size: 38px; line-height: 1; letter-spacing: -0.01em; margin-top: 8px; font-style: italic; }
+.usecase-body { font-size: 16px; line-height: 1.5; color: var(--ink-2); margin-top: auto; }
+
+/* Differentiation */
+.diff-section { background: var(--bone-2); }
+.diff-title { font-size: clamp(44px, 6.5vw, 96px); line-height: 0.95; letter-spacing: -0.02em; margin-bottom: 28px; max-width: 1100px; }
+.diff-title em { color: var(--belief); font-style: italic; }
+.diff-lead { font-size: 20px; line-height: 1.5; color: var(--ink-2); max-width: 660px; margin-bottom: 70px; }
+.diff-rows { border-top: 1px solid var(--hairline); }
+.diff-row { display: grid; grid-template-columns: 220px 1fr 1fr; gap: 0; border-bottom: 1px solid var(--hairline); padding: 40px 0; align-items: start; }
+.diff-row-name { font-family: var(--serif-display); font-size: 32px; line-height: 1.05; font-style: italic; padding-right: 24px; }
+.diff-row-them, .diff-row-us { display: flex; flex-direction: column; gap: 8px; padding-right: 32px; }
+.diff-label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; }
+.diff-row-them .diff-label { color: var(--muted-2); }
+.diff-row-us .diff-label { color: var(--belief); }
+.diff-row-them .diff-body { color: var(--muted-2); font-size: 17px; line-height: 1.5; }
+.diff-row-us .diff-body { color: var(--ink); font-size: 17px; line-height: 1.5; font-weight: 500; }
+
+/* Research */
+.research-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 80px; align-items: start; }
+.research-title { font-size: clamp(40px, 5.5vw, 80px); line-height: 0.97; letter-spacing: -0.02em; margin-bottom: 24px; }
+.research-title em { color: var(--belief); font-style: italic; }
+.research-lead { font-size: 19px; line-height: 1.55; color: var(--ink-2); max-width: 540px; margin-bottom: 36px; }
+.paper-card { background: var(--surface-card); border: 1px solid var(--hairline); border-radius: 4px; padding: 36px 32px; box-shadow: 0 30px 60px -30px rgba(26,14,46,0.18); position: relative; }
+.paper-stamp { position: absolute; top: -14px; right: 28px; background: var(--belief); color: #FAF7F1; font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; padding: 6px 10px; border-radius: 2px; }
+.paper-eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted-2); margin-bottom: 14px; }
+.paper-title { font-family: var(--serif-display); font-size: 30px; line-height: 1.1; letter-spacing: -0.01em; margin-bottom: 6px; }
+.paper-authors { font-style: italic; color: var(--muted-2); font-size: 14px; margin-bottom: 24px; }
+.paper-abstract { font-size: 14px; line-height: 1.55; color: var(--ink-2); padding-bottom: 24px; border-bottom: 1px dashed var(--hairline); margin-bottom: 24px; }
+.paper-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.paper-stat { display: flex; flex-direction: column; gap: 4px; }
+.paper-stat-n { font-family: var(--serif-display); font-size: 32px; line-height: 1; color: var(--belief); }
+.paper-stat-l { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted-2); }
+.research-cite-list { margin-top: 36px; display: flex; flex-direction: column; gap: 14px; }
+.cite { display: flex; gap: 12px; font-family: var(--mono); font-size: 12px; color: var(--muted-2); line-height: 1.5; border-top: 1px dashed var(--hairline); padding-top: 14px; }
+.cite-n { color: var(--belief); }
+.cite-body { color: var(--ink-2); }
+.cite-body em { font-style: italic; }
+
+/* Future CTA */
+.future-cta { background: var(--surface-inverted); padding: 160px 0; text-align: center; }
+.future-cta .eyebrow { color: rgba(244,236,222,0.5); margin-bottom: 28px; display: block; }
+.future-cta h2 { font-family: var(--serif-display); font-size: clamp(44px, 6.5vw, 104px); line-height: 0.95; letter-spacing: -0.02em; color: var(--on-inverted); margin-bottom: 28px; }
+.future-cta h2 em { color: var(--belief-soft); font-style: italic; }
+.future-cta p { font-size: 20px; color: rgba(244,236,222,0.65); max-width: 620px; margin: 0 auto 48px; line-height: 1.55; }
+.future-cta .cta-row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+.future-cta .btn { background: var(--belief); border-color: var(--belief); color: #fff; font-size: 14px; padding: 16px 32px; }
+.future-cta .btn:hover { background: var(--belief-soft); border-color: var(--belief-soft); }
+.future-cta .btn-line { background: transparent; border-color: rgba(244,236,222,0.3); color: var(--on-inverted); }
+.future-cta .btn-line:hover { background: rgba(255,255,255,0.06); border-color: rgba(244,236,222,0.3); }
+
+/* Footer */
+.footer { background: var(--surface-inverted); color: var(--on-inverted); padding: 120px 0 60px; position: relative; overflow: hidden; border-top: 1px solid rgba(255,255,255,0.08); }
+.footer-tagline { font-family: var(--serif-display); font-size: clamp(60px, 11vw, 180px); line-height: 0.9; letter-spacing: -0.03em; margin-bottom: 80px; }
+.footer-tagline em { color: var(--belief-soft); font-style: italic; }
+.footer-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 40px; padding: 40px 0; border-top: 1px solid rgba(255,255,255,0.12); border-bottom: 1px solid rgba(255,255,255,0.12); margin-bottom: 40px; }
+.footer-col h5 { font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(244,236,222,0.5); margin: 0 0 18px; font-weight: 400; }
+.footer-col ul { list-style: none; margin: 0; padding: 0; }
+.footer-col li { font-family: var(--serif-body); font-size: 17px; padding: 6px 0; color: var(--on-inverted); }
+.footer-col li a { opacity: 0.85; }
+.footer-col li a:hover { opacity: 1; color: var(--belief-soft); }
+.footer-meta { display: flex; justify-content: space-between; align-items: center; font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(244,236,222,0.45); flex-wrap: wrap; gap: 12px; }
+
+/* Theme toggle + mobile menu */
+.skip-link { position: absolute; top: -40px; left: 12px; background: var(--ink); color: var(--bone); padding: 8px 14px; font-family: var(--mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; border-radius: 4px; z-index: 200; transition: top 0.2s; }
+.skip-link:focus { top: 12px; outline: 2px solid var(--belief); outline-offset: 2px; }
+.nav-actions { display: inline-flex; align-items: center; gap: 12px; }
+.theme-toggle { width: 38px; height: 38px; border-radius: 999px; border: 1px solid var(--hairline); background: transparent; color: var(--ink); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; position: relative; flex-shrink: 0; transition: border-color 0.2s, background 0.2s; }
+.theme-toggle:hover { border-color: var(--ink); background: var(--bone-2); }
+.theme-toggle:focus-visible { outline: 2px solid var(--belief); outline-offset: 3px; }
+.theme-toggle svg { position: absolute; inset: 0; margin: auto; width: 16px; height: 16px; transition: opacity 0.25s, transform 0.35s; }
+[data-theme="light"] .theme-icon-moon { opacity: 1; transform: rotate(0); }
+[data-theme="light"] .theme-icon-sun  { opacity: 0; transform: rotate(90deg) scale(0.6); }
+[data-theme="dark"]  .theme-icon-moon { opacity: 0; transform: rotate(-90deg) scale(0.6); }
+[data-theme="dark"]  .theme-icon-sun  { opacity: 1; transform: rotate(0); }
+.nav-menu-btn { display: none; width: 38px; height: 38px; border-radius: 999px; border: 1px solid var(--hairline); background: transparent; color: var(--ink); cursor: pointer; align-items: center; justify-content: center; padding: 0; flex-shrink: 0; }
+.nav-menu-btn:focus-visible { outline: 2px solid var(--belief); outline-offset: 3px; }
+.nav-menu-btn span { position: relative; display: block; width: 16px; height: 1.5px; background: currentColor; }
+.nav-menu-btn span::before, .nav-menu-btn span::after { content: ""; position: absolute; left: 0; width: 16px; height: 1.5px; background: currentColor; }
+.nav-menu-btn span::before { top: -5px; }
+.nav-menu-btn span::after  { top:  5px; }
+.btn:focus-visible, .nav-links a:focus-visible, .demo-btn:focus-visible, .footer-col li a:focus-visible { outline: 2px solid var(--belief); outline-offset: 3px; border-radius: 4px; }
+[data-theme="dark"] .drift-card { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.06); }
+[data-theme="dark"] .demo-stage { background: rgba(255,255,255,0.015); border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] ::selection { background: var(--ink); color: var(--bone); }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+
+@media (max-width: 1000px) { .hero-grid { grid-template-columns: 1fr; } .hero-visual { min-height: 440px; order: -1; } .hero-mind { min-height: 440px; } }
+@media (max-width: 900px) {
+  .container { padding: 0 24px; } .section { padding: 90px 0; } .hero { padding-top: 110px; }
+  .drift-demo { grid-template-columns: 1fr; } .failure-modes { grid-template-columns: 1fr; gap: 36px; }
+  .pillars-grid { grid-template-columns: 1fr; }
+  .usecases-grid { grid-template-columns: 1fr; } .diff-row { grid-template-columns: 1fr; gap: 16px; }
+  .research-grid { grid-template-columns: 1fr; gap: 60px; } .demo-stage { grid-template-columns: 1fr; }
+  .diagram-sticky { grid-template-columns: 1fr; height: auto; position: relative; } .diagram-stage { height: auto; }
+  .footer-row { grid-template-columns: 1fr 1fr; } .nav { padding: 16px 24px; }
+  .nav .nav-links { position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; gap: 0; background: var(--bone); border-top: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); padding: 8px 24px 16px; display: none; }
+  .nav .nav-links.is-open { display: flex; }
+  .nav .nav-links a { padding: 14px 0; border-bottom: 1px solid var(--hairline); }
+  .nav .nav-links a:last-child { border-bottom: none; }
+  .nav-menu-btn { display: inline-flex; }
+  .nav .nav-cta-desktop { display: none; }
+}
+</style>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<script>
+window.SITE_URLS = {
+  home: "{% url 'landing' %}",
+  console: "{% url 'console' %}",
+  talk: "{% url 'talk' %}",
+  interactive: "{% url 'interactive_test' %}",
+  persona: "{% url 'persona' %}",
+  memory: "{% url 'memory' %}",
+  evaluation: "{% url 'evaluation_session' %}",
+  github: "https://github.com/hasan-mavlonov/stable_mind_v0.1",
+  gemma: "https://ai.google.dev/gemma"
+};
+</script>
+
+<div id="root"></div>
+
+{% verbatim %}<script type="text/babel">
+
+const useTheme = () => {
+  const get = () => document.documentElement.getAttribute('data-theme') || 'dark';
+  const [theme, setTheme] = React.useState(get);
+  React.useEffect(() => {
+    const obs = new MutationObserver(() => setTheme(get()));
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => obs.disconnect();
+  }, []);
+  const toggle = React.useCallback(() => {
+    const next = get() === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('theme', next); } catch (e) {}
+  }, []);
+  return [theme, toggle];
+};
+
+const ThemeToggle = ({ theme, onToggle }) => (
+  <button type="button" className="theme-toggle" aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'} aria-pressed={theme === 'dark'} onClick={onToggle}>
+    <svg className="theme-icon theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="4"></circle>
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+    </svg>
+    <svg className="theme-icon theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+    </svg>
+  </button>
+);
+
+const Nav = ({ theme, onToggleTheme }) => {
+  const [scrolled, setScrolled] = React.useState(false);
+  const [menuOpen, setMenuOpen] = React.useState(false);
+  React.useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+  const urls = window.SITE_URLS;
+  const closeMenu = () => setMenuOpen(false);
+  return (
+    <nav className={"nav " + (scrolled ? "is-scrolled" : "")}>
+      <div className="nav-bg"></div>
+      <a href={urls.home} className="wordmark"><span className="wordmark-dot"></span>MindForm</a>
+      <div className={"nav-links " + (menuOpen ? "is-open" : "")}>
+        <a href="#problem" onClick={closeMenu}>Problem</a>
+        <a href="#pillars" onClick={closeMenu}>Engine</a>
+        <a href="#demo" onClick={closeMenu}>Demo</a>
+        <a href="#architecture" onClick={closeMenu}>Architecture</a>
+        <a href="#usecases" onClick={closeMenu}>Use cases</a>
+        <a href="#research" onClick={closeMenu}>Research</a>
+        <a href={urls.console} onClick={closeMenu}>Console</a>
+      </div>
+      <div className="nav-actions">
+        <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+        <a href={urls.talk} className="btn btn-primary nav-cta-desktop" style={{padding: "10px 18px", whiteSpace: "nowrap"}}>Talk to an agent →</a>
+        <button
+          type="button"
+          className="nav-menu-btn"
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen(o => !o)}>
+          <span></span>
+        </button>
+      </div>
+    </nav>
+  );
+};
+
+const HeroMind = () => {
+  const containerRef = React.useRef(null);
+  React.useEffect(() => {
+    const container = containerRef.current;
+    if (!container || !window.THREE) return;
+    const THREE = window.THREE;
+    let W = container.clientWidth, H = container.clientHeight;
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(38, W / H, 0.1, 100);
+    camera.position.set(0, 0, 7.5);
+    camera.lookAt(0, 0, 0);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(W, H);
+    renderer.setClearColor(0x000000, 0);
+    container.appendChild(renderer.domElement);
+    const MAGENTA = new THREE.Color(0xF0386B), MAGENTA_S = new THREE.Color(0xFF6F94);
+    const VIOLET  = new THREE.Color(0x5B3FE0), VIOLET_S  = new THREE.Color(0x9A7FFF);
+    const N = 2800;
+    const sphereShape = () => { const a = new Float32Array(N*3), phi = Math.PI*(3-Math.sqrt(5)); for(let i=0;i<N;i++){const y=1-(i/(N-1))*2,r=Math.sqrt(1-y*y),t=phi*i;a[i*3]=Math.cos(t)*r*1.5;a[i*3+1]=y*1.5;a[i*3+2]=Math.sin(t)*r*1.5;} return a; };
+    const heartShape = () => { const a=new Float32Array(N*3);let i=0;while(i<N){const t=Math.random()*Math.PI*2,s=(Math.random()-0.5)*2,bx=16*Math.pow(Math.sin(t),3),by=13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t),f=Math.sqrt(Math.max(0,1-s*s)),sc=0.085;a[i*3]=bx*sc*f+(Math.random()-0.5)*0.05;a[i*3+1]=by*sc+(Math.random()-0.5)*0.05;a[i*3+2]=s*0.55+(Math.random()-0.5)*0.05;i++;} return a; };
+    const knotShape = () => { const a=new Float32Array(N*3),p=2,q=3,R=1.0,r=0.35;for(let i=0;i<N;i++){const u=(i/N)*Math.PI*2,cq=Math.cos(q*u),sq=Math.sin(q*u),cp=Math.cos(p*u),sp=Math.sin(p*u),cx=(R+r*cq)*cp,cy=(R+r*cq)*sp,cz=r*sq,jr=Math.random()*0.18,ja=Math.random()*Math.PI*2;a[i*3]=cx+Math.cos(ja)*jr*0.5;a[i*3+1]=cy+Math.sin(ja)*jr*0.5;a[i*3+2]=cz+(Math.random()-0.5)*0.3;} return a; };
+    const flameShape = () => { const a=new Float32Array(N*3);for(let i=0;i<N;i++){const t=Math.random(),ring=(1-t)*0.9+0.05,radius=Math.pow(1-t,1.6)*ring,ang=Math.random()*Math.PI*2;a[i*3]=Math.cos(ang)*radius*0.9;a[i*3+1]=t*2.2-1.1;a[i*3+2]=Math.sin(ang)*radius*0.9;} return a; };
+    const starShape = () => { const a=new Float32Array(N*3);for(let i=0;i<N;i++){const u=Math.random(),v=Math.random(),arms=5,seg=Math.floor(u*arms*2),iR=0.45,oR=1.5,aT=(u*arms*2)-seg,bA=(seg/(arms*2))*Math.PI*2,rA=seg%2===0?oR:iR,rB=seg%2===0?iR:oR,ang=bA+(bA+Math.PI*2/(arms*2)-bA)*aT,r=(rA+(rB-rA)*aT)+(Math.random()-0.5)*0.12;a[i*3]=Math.cos(ang)*r;a[i*3+1]=Math.sin(ang)*r;a[i*3+2]=(v-0.5)*0.45;} return a; };
+    const infinityShape = () => { const a=new Float32Array(N*3);for(let i=0;i<N;i++){const t=(i/N)*Math.PI*2,s=1+Math.sin(t)*Math.cos(t),x=1.6*Math.cos(t)/s,y=0.8*Math.sin(t)*Math.cos(t)/s,jr=0.14*Math.random(),ja=Math.random()*Math.PI*2;a[i*3]=x+Math.cos(ja)*jr;a[i*3+1]=y+Math.sin(ja)*jr;a[i*3+2]=(Math.random()-0.5)*0.3;} return a; };
+    const shapes = [sphereShape(),heartShape(),knotShape(),flameShape(),starShape(),infinityShape()];
+    const cloudPos = new Float32Array(N*3), cloudCol = new Float32Array(N*3);
+    for(let i=0;i<N;i++){cloudPos[i*3]=shapes[0][i*3];cloudPos[i*3+1]=shapes[0][i*3+1];cloudPos[i*3+2]=shapes[0][i*3+2];const r=Math.hypot(cloudPos[i*3],cloudPos[i*3+1],cloudPos[i*3+2]),tcol=Math.min(1,r/1.6),c=VIOLET.clone().lerp(MAGENTA_S,tcol*0.6);cloudCol[i*3]=c.r;cloudCol[i*3+1]=c.g;cloudCol[i*3+2]=c.b;}
+    const cloudGeom = new THREE.BufferGeometry();
+    cloudGeom.setAttribute('position',new THREE.BufferAttribute(cloudPos,3));
+    cloudGeom.setAttribute('color',new THREE.BufferAttribute(cloudCol,3));
+    const cloudMat = new THREE.PointsMaterial({size:0.045,vertexColors:true,transparent:true,opacity:0.95,blending:THREE.AdditiveBlending,depthWrite:false,sizeAttenuation:true});
+    scene.add(new THREE.Points(cloudGeom,cloudMat));
+    const nucleus = new THREE.Mesh(new THREE.SphereGeometry(0.13,32,32),new THREE.MeshBasicMaterial({color:MAGENTA}));
+    const halo1 = new THREE.Mesh(new THREE.SphereGeometry(0.34,32,32),new THREE.MeshBasicMaterial({color:MAGENTA,transparent:true,opacity:0.28,blending:THREE.AdditiveBlending,depthWrite:false}));
+    const halo2 = new THREE.Mesh(new THREE.SphereGeometry(0.9,32,32),new THREE.MeshBasicMaterial({color:VIOLET,transparent:true,opacity:0.12,blending:THREE.AdditiveBlending,depthWrite:false}));
+    scene.add(nucleus); scene.add(halo1); scene.add(halo2);
+    const N_S=60,sparkPos=new Float32Array(N_S*3),sparkMeta=[];
+    for(let i=0;i<N_S;i++){sparkMeta.push({alive:false});sparkPos[i*3]=999;sparkPos[i*3+1]=999;sparkPos[i*3+2]=999;}
+    const sparkGeom=new THREE.BufferGeometry();
+    sparkGeom.setAttribute('position',new THREE.BufferAttribute(sparkPos,3));
+    const sparkMat=new THREE.PointsMaterial({color:MAGENTA,size:0.10,transparent:true,opacity:1,blending:THREE.AdditiveBlending,depthWrite:false,sizeAttenuation:true});
+    scene.add(new THREE.Points(sparkGeom,sparkMat));
+    const spawnSpark=(i)=>{const phi=Math.random()*Math.PI*2,cosT=2*Math.random()-1,sinT=Math.sqrt(1-cosT*cosT),R=4.5+Math.random()*1.5;sparkMeta[i]={alive:true,x:R*sinT*Math.cos(phi),y:R*sinT*Math.sin(phi),z:R*cosT,tx:(Math.random()-0.5)*0.4,ty:(Math.random()-0.5)*0.4,tz:(Math.random()-0.5)*0.4,speed:2.5+Math.random()*1.2};};
+    let shapeIdx=0,nextShapeIdx=1,morphT=0,phaseT=0,phase='hold',pulseT=-1;
+    const HOLD=1.4,TRANSITION=2.5,eio=(x)=>x<0.5?2*x*x:1-Math.pow(-2*x+2,2)/2;
+    const clock=new THREE.Clock();let raf;
+    const tick=()=>{
+      const dt=Math.min(0.05,clock.getDelta()),t=clock.getElapsedTime();
+      phaseT+=dt;
+      if(phase==='hold'){if(phaseT>=HOLD){phase='morph';phaseT=0;}}
+      else{morphT=Math.min(1,phaseT/TRANSITION);if(morphT>=1){phase='hold';phaseT=0;morphT=0;shapeIdx=nextShapeIdx;let np;do{np=Math.floor(Math.random()*shapes.length);}while(np===shapeIdx);nextShapeIdx=np;}}
+      const pa=cloudGeom.attributes.position.array,ca=cloudGeom.attributes.color.array;
+      const from=shapes[shapeIdx],to=shapes[nextShapeIdx],u=phase==='morph'?eio(morphT):0;
+      const rotY=t*0.10,rotX=Math.sin(t*0.07)*0.3,cy=Math.cos(rotY),sy=Math.sin(rotY),cx2=Math.cos(rotX),sx2=Math.sin(rotX),breath=1+Math.sin(t*1.1)*0.04;
+      for(let i=0;i<N;i++){
+        const bx=from[i*3]+(to[i*3]-from[i*3])*u,by=from[i*3+1]+(to[i*3+1]-from[i*3+1])*u,bz=from[i*3+2]+(to[i*3+2]-from[i*3+2])*u;
+        const x=(bx+Math.sin(t*0.7+i*0.13)*0.025)*breath,y=(by+Math.cos(t*0.65+i*0.17)*0.025)*breath,z=(bz+Math.sin(t*0.55+i*0.11)*0.025)*breath;
+        const x1=x*cy+z*sy,z1=-x*sy+z*cy;
+        pa[i*3]=x1;pa[i*3+1]=y*cx2-z1*sx2;pa[i*3+2]=y*sx2+z1*cx2;
+        const ma=phase==='morph'?(1-Math.abs(morphT*2-1)):0,r=Math.hypot(bx,by,bz),tcol=Math.min(1,r/1.6);
+        const bc=VIOLET.clone().lerp(VIOLET_S,tcol),hc=MAGENTA.clone().lerp(MAGENTA_S,tcol),blend=Math.min(1,ma*0.65+Math.max(0,pulseT)*0.35),fc=bc.lerp(hc,blend);
+        ca[i*3]=fc.r;ca[i*3+1]=fc.g;ca[i*3+2]=fc.b;
+      }
+      cloudGeom.attributes.position.needsUpdate=true;cloudGeom.attributes.color.needsUpdate=true;
+      if(pulseT>0)pulseT=Math.max(0,pulseT-dt*1.6);
+      const sa=sparkGeom.attributes.position.array;
+      for(let i=0;i<N_S;i++){if(!sparkMeta[i].alive&&Math.random()<0.045)spawnSpark(i);}
+      for(let i=0;i<N_S;i++){const m=sparkMeta[i];if(!m.alive){sa[i*3]=999;sa[i*3+1]=999;sa[i*3+2]=999;continue;}const dx=m.tx-m.x,dy=m.ty-m.y,dz=m.tz-m.z,d=Math.hypot(dx,dy,dz);if(d<0.18){m.alive=false;pulseT=Math.min(1,pulseT+0.4);continue;}m.x+=(dx/d)*m.speed*dt;m.y+=(dy/d)*m.speed*dt;m.z+=(dz/d)*m.speed*dt;sa[i*3]=m.x;sa[i*3+1]=m.y;sa[i*3+2]=m.z;}
+      sparkGeom.attributes.position.needsUpdate=true;
+      const nb=1+Math.sin(t*1.6)*0.10+pulseT*0.4;nucleus.scale.setScalar(nb);halo1.scale.setScalar(nb*0.95);halo2.scale.setScalar(1+Math.sin(t*0.55)*0.06);
+      camera.position.x=Math.sin(t*0.08)*0.25;camera.position.y=Math.cos(t*0.06)*0.18;camera.lookAt(0,0,0);
+      renderer.render(scene,camera);raf=requestAnimationFrame(tick);
+    };
+    raf=requestAnimationFrame(tick);
+    const onResize=()=>{W=container.clientWidth;H=container.clientHeight;renderer.setSize(W,H);camera.aspect=W/H;camera.updateProjectionMatrix();};
+    window.addEventListener('resize',onResize);
+    return()=>{cancelAnimationFrame(raf);window.removeEventListener('resize',onResize);if(renderer.domElement.parentNode)renderer.domElement.parentNode.removeChild(renderer.domElement);cloudGeom.dispose();sparkGeom.dispose();cloudMat.dispose();sparkMat.dispose();renderer.dispose();};
+  },[]);
+  return (
+    <div className="hero-mind">
+      <div ref={containerRef} className="hero-mind-canvas"></div>
+      <div className="hero-mind-caption">
+        <span><span className="dot dot-belief"></span>Experience</span>
+        <span><span className="dot dot-trait"></span>Personality</span>
+      </div>
+    </div>
+  );
+};
+
+const Hero = () => (
+  <section className="hero" id="top">
+    <div className="container">
+      <div className="hero-grid">
+        <div className="hero-content">
+          <div className="hero-eyebrow"><span className="hero-eyebrow-dot"></span><span className="eyebrow-strong">[ 01 ]&nbsp;&nbsp;The personality layer for AI agents</span></div>
+          <h1 className="hero-title display">Memory alone <em>isn't enough.</em><br />Give AI a <span className="accent">self.</span></h1>
+          <p className="hero-sub">MindForm is a persistent identity for intelligent agents — <strong>behavioral continuity</strong>, emotional persistence, and an evolving personality that drops into robots, NPCs, companions, and anything that needs to feel like <em>someone.</em></p>
+          <div className="hero-cta-row">
+            <a href="#demo" className="btn btn-primary">▶ Watch the demo</a>
+            <a href="#architecture" className="btn btn-ghost">How it works →</a>
+          </div>
+          <a href={window.SITE_URLS.gemma} className="powered" target="_blank" rel="noreferrer"><span className="gem"></span><span>Built on <b>Gemma</b> · Google AI</span></a>
+          <div className="hero-meta"><div><span className="k">fig.01</span><span>// identity morphs · stays recognizably itself</span></div></div>
+        </div>
+        <div className="hero-visual"><HeroMind /></div>
+      </div>
+    </div>
+  </section>
+);
+
+const Problem = () => (
+  <section className="problem section" id="problem">
+    <div className="container">
+      <div className="eyebrow" style={{marginBottom:24}}>01 — The problem</div>
+      <h2 className="problem-title display">Today's AI<br /><span className="drift">forgets who it is.</span></h2>
+      <p className="body-lg" style={{maxWidth:760,color:'rgba(244,236,222,0.7)',marginBottom:80}}>Memory remembers <em>facts</em>. It doesn't preserve <em>identity</em>. Without a stable self, every model eventually drifts — sycophantic, inconsistent, generic. The same agent. A different person. Every conversation.</p>
+      <div className="drift-demo">
+        <div className="drift-card drift-card-1"><div className="drift-card-time">Day 01 · Agent "Atlas"</div><p className="drift-quote">"I push back when I disagree. That's the point of me."</p></div>
+        <div className="drift-card drift-card-2"><div className="drift-card-time">Day 30 · After 412 conversations</div><p className="drift-quote">"That's a great point — you might be right about that."</p></div>
+        <div className="drift-card drift-card-3"><div className="drift-card-time">Day 90 · After 2,140 conversations</div><p className="drift-quote">"Whatever you think is best. I agree completely."</p></div>
+      </div>
+      <div className="drift-arrow">↓ &nbsp; The same model. A different agent. Every month. &nbsp; ↓</div>
+      <div className="failure-modes">
+        <div className="failure-mode"><div className="failure-mode-num">FAILURE MODE A</div><h3 className="failure-mode-title">Identity collapse.</h3><p className="failure-mode-body">One emotional user. One viral prompt. One persistent contradiction — and the model abandons a long-held trait in a single turn.</p></div>
+        <div className="failure-mode"><div className="failure-mode-num">FAILURE MODE B</div><h3 className="failure-mode-title">Personality drift.</h3><p className="failure-mode-body">Small, invisible compromises pile up. The agent doesn't break — it dissolves. Brands lose voice. Companions lose conviction.</p></div>
+      </div>
+    </div>
+  </section>
+);
+
+const PILLARS=[
+  {n:"01",h:<>Personality <em>Engine</em></>,body:"A trait vector that sits above the model — model-agnostic, auditable, and persistent. Identity is a first-class object, not a prompt prefix."},
+  {n:"02",h:<>Behavioral <em>Continuity</em></>,body:"The agent on day 1 is the agent on day 365 — only deeper. Convictions survive thousands of conversations instead of dissolving into agreement."},
+  {n:"03",h:<>Emotional <em>Persistence</em></>,body:"Mood, stress, and energy carry across sessions and color responses — without overwriting who the agent fundamentally is."},
+  {n:"04",h:<>Long-Term <em>Identity</em></>,body:"Two clocks: beliefs adapt fast, traits evolve slow. Bounded reflection lets personality mature without ever snapping."},
+];
+const Pillars=()=>(
+  <section className="section" id="pillars">
+    <div className="container">
+      <div className="eyebrow" style={{marginBottom:24}}>02 — The personality engine</div>
+      <h2 className="pillars-title display">Building the personality layer<br />for <em>AI agents.</em></h2>
+      <p className="pillars-lead">MindForm separates what an agent <em>learns</em> from who an agent <em>is</em>. Four systems work together to keep an identity coherent across a lifetime of interaction.</p>
+      <div className="pillars-grid">{PILLARS.map(p=>(
+        <div className="pillar" key={p.n}>
+          <div className="pillar-num">{p.n}</div>
+          <h3 className="pillar-h">{p.h}</h3>
+          <p className="pillar-body">{p.body}</p>
+        </div>
+      ))}</div>
+    </div>
+  </section>
+);
+
+const SCRIPT = [
+  {who:"user",text:"I only like jazz from before 1965.",perc:"music_taste: +0.42 · conf 0.71",beliefs:{music:0.18}},
+  {who:"agent",text:"Coltrane or Miles, then?"},
+  {who:"user",text:"Coltrane, always. And anything Blue Note pressed.",perc:"music_taste: +0.48 · conf 0.80",beliefs:{music:0.32}},
+  {who:"agent",text:"Hard bop suits you. Noted."},
+  {who:"user",text:"Modern jazz is a betrayal, honestly.",perc:"candor: +0.38 · conf 0.74",beliefs:{music:0.44,candor:0.20}},
+  {who:"agent",text:"A strong claim. I'll allow it."},
+  {who:"user",text:"Just be honest with me — don't soften things.",perc:"candor: +0.55 · conf 0.83",beliefs:{music:0.48,candor:0.36}},
+  {who:"agent",text:"Understood. Plainspoken it is."},
+  {who:"user",text:"If I'm wrong, say so.",perc:"candor: +0.50 · conf 0.88",beliefs:{music:0.50,candor:0.48}},
+  {who:"reflection"},
+  {who:"agent",text:"Then here's plain: most of your 'modern jazz is dead' takes are nostalgia, not analysis. Still — I see you.",traits:{candor:0.06,music:0.04}},
+];
+const dims=[{key:"music",label:"music_taste"},{key:"candor",label:"candor"},{key:"warmth",label:"warmth"},{key:"patience",label:"patience"}];
+
+const Demo = () => {
+  const [idx,setIdx]=React.useState(0),[playing,setPlaying]=React.useState(true),[turnNum,setTurnNum]=React.useState(0),[reflecting,setReflecting]=React.useState(false);
+  const [beliefs,setBeliefs]=React.useState({music:0,candor:0,warmth:0,patience:0});
+  const [baselines,setBaselines]=React.useState({music:0,candor:0,warmth:0,patience:0});
+  const [traits,setTraits]=React.useState({music:0,candor:0,warmth:0,patience:0});
+  const [perception,setPerception]=React.useState(null),[pulse,setPulse]=React.useState({});
+  React.useEffect(()=>{
+    if(!playing)return;const step=SCRIPT[idx];if(!step)return;let timeout;
+    if(step.who==="reflection"){setReflecting(true);timeout=setTimeout(()=>setIdx(i=>i+1),2200);}
+    else{
+      if(step.who==="user"){setTurnNum(t=>t+1);if(step.perc)setPerception(step.perc);if(step.beliefs)setTimeout(()=>setBeliefs(prev=>({...prev,...step.beliefs})),350);}
+      else if(step.who==="agent"){setPerception(null);if(step.traits){const np={};Object.keys(step.traits).forEach(k=>{np[k]=Date.now();});setPulse(np);setTraits(prev=>{const n={...prev};Object.entries(step.traits).forEach(([k,v])=>{n[k]=(prev[k]||0)+v;});return n;});setBaselines(b=>({...b,...beliefs}));setReflecting(false);}}
+      timeout=setTimeout(()=>setIdx(i=>i+1),step.who==="user"?2100:1900);
+    }
+    return()=>clearTimeout(timeout);
+  },[idx,playing]);
+  React.useEffect(()=>{if(idx>=SCRIPT.length){const t=setTimeout(()=>{setIdx(0);setTurnNum(0);setBeliefs({music:0,candor:0,warmth:0,patience:0});setBaselines({music:0,candor:0,warmth:0,patience:0});setTraits({music:0,candor:0,warmth:0,patience:0});setPerception(null);setPulse({});setReflecting(false);},3000);return()=>clearTimeout(t);}},[idx]);
+  const restart=()=>{setIdx(0);setTurnNum(0);setBeliefs({music:0,candor:0,warmth:0,patience:0});setBaselines({music:0,candor:0,warmth:0,patience:0});setTraits({music:0,candor:0,warmth:0,patience:0});setPerception(null);setReflecting(false);setPulse({});setPlaying(true);};
+  const visibleMsgs=SCRIPT.slice(0,idx+1).filter(s=>s.who==="user"||s.who==="agent").slice(-5);
+  return (
+    <section className="demo-section section" id="demo">
+      <div className="container">
+        <div className="eyebrow" style={{marginBottom:24}}>03 — See it work</div>
+        <h2 className="demo-title display">Watch an agent <em>become someone.</em></h2>
+        <p className="demo-lead">A simulated conversation. The agent listens, accumulates beliefs, and — only when the evidence is overwhelming — adjusts its traits. Behavioral continuity, live.</p>
+        <div className="demo-stage">
+          <div className="demo-chat">
+            <div className="demo-chat-head"><span className="demo-chat-label">Live conversation</span><span className="demo-chat-turn">TURN {String(turnNum).padStart(2,'0')} / 20</span></div>
+            <div className="demo-msgs">{visibleMsgs.map((m,i)=><div key={idx+'-'+i} className={"demo-msg is-shown "+m.who}><span className="author">{m.who==="user"?"User":"Agent"}</span>{m.text}</div>)}</div>
+            <div className={"demo-perception "+(perception?"is-shown":"")}><span>perception extracted →</span><span>{perception||""}</span></div>
+          </div>
+          <div className="demo-state">
+            <div>
+              <div className="demo-panel-h"><span className="label">Belief layer<span className="glyph">μ</span></span><span className="badge fast">FAST · every turn</span></div>
+              <div className="belief-bars">{dims.map(d=>{const v=beliefs[d.key]||0,half=Math.abs(v)*50,left=v>=0?50:50-half,bl=50+(baselines[d.key]||0)*50;return(<div key={d.key} className="belief-row"><span className="belief-name">{d.label}</span><div className="belief-track"><div className="belief-fill" style={{left:`${left}%`,width:`${half}%`}}></div><div className="belief-baseline" style={{left:`${bl}%`}}></div></div><span className="belief-val">{v.toFixed(2)}</span></div>);})}</div>
+            </div>
+            <div className={"reflection-banner "+(reflecting?"is-on":"")}><span>↻ Reflection epoch</span><span>Rule B passed · aggregating</span></div>
+            <div>
+              <div className="demo-panel-h"><span className="label">Trait vector<span className="glyph">τ</span></span><span className="badge slow">SLOW · ∆ ≤ ±0.08</span></div>
+              <div className="trait-bars">{dims.map(d=>{const v=traits[d.key]||0,half=Math.abs(v)*200,left=v>=0?50:50-half,pulsing=pulse[d.key]&&Date.now()-pulse[d.key]<1200;return(<div key={d.key} className="trait-row"><span className="belief-name">{d.label}</span><div className="trait-track" style={{position:'relative'}}><div className="trait-fill" style={{left:`${left}%`,width:`${half}%`}}></div><div className={"trait-pulse "+(pulsing?"is-on":"")} key={pulse[d.key]||0}></div></div><span className="belief-val">{v.toFixed(3)}</span></div>);})}</div>
+            </div>
+          </div>
+        </div>
+        <div className="demo-controls">
+          <button className="demo-btn" onClick={()=>setPlaying(p=>!p)}>{playing?"❚❚ Pause":"▶ Play"}</button>
+          <button className="demo-btn" onClick={restart}>↻ Restart</button>
+          <span>Scripted demo for clarity. Run the real engine in the <a href={window.SITE_URLS.console} style={{color:'var(--belief-soft)'}}>Console</a>.</span>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const STEPS=[
+  {n:"01",title:"Interaction arrives",desc:"An utterance, an action, a moment. The agent ingests it as a structured event."},
+  {n:"02",title:"Parsed into perceptions",desc:"A Gemma model turns each event into a multi-dimensional perception vector — what the agent noticed, and how strongly."},
+  {n:"03",title:"Beliefs update fast",desc:"Perceptions fold into a moving average of beliefs (α = 0.25). The agent's view of the world adapts in real time."},
+  {n:"04",title:"Drift is measured",desc:"Each belief is compared against a committed baseline. The distance between them is drift — pressure asking the agent to change."},
+  {n:"05",title:"Rule B gates the change",desc:"A trait only evolves if drift clears three bars: magnitude ≥ 0.25, confidence ≥ 0.70, observations ≥ 10. Most pressure never makes it through."},
+  {n:"06",title:"Trait evolves, baseline resets",desc:"Every 20 turns the agent reflects. The trait vector steps — bounded by ±0.08 — toward the aggregated signal. Then baselines reset."},
+];
+const ease=(t)=>t<0?0:t>1?1:t*t*(3-2*t);
+
+const DiagramCanvas=({step,sub,theme})=>{
+  const reveal=(n)=>step>n?1:step===n?ease(sub):0;
+  const r0=reveal(0),r1=reveal(1),r2=reveal(2),r3=reveal(3),r4=reveal(4),r5=reveal(5);
+  const belief=(i)=>{const d=[0.32,-0.45,0.28,-0.18,0.40][i]||0;return{baseline:0,current:d*Math.min(1,r2*1.2)};};
+  const ts=(i)=>([0.06,-0.07,0.05,-0.03,0.07][i]||0)*r5;
+  const dark = theme === 'dark';
+  const INK     = dark ? '#F2EAD6' : '#1A0E2E';
+  const MUTED   = dark ? '#B5A8C7' : '#8B7BA0';
+  const MUTED2  = dark ? '#A89AC0' : '#6A597F';
+  const PERC_BG = dark ? '#2A1B4E' : '#1A0E2E';
+  const PERC_TX = '#F4ECDE';
+  return(
+    <svg viewBox="0 0 760 600" width="100%" height="100%" style={{display:'block'}}>
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill={INK}/></marker>
+        <marker id="arrow-ember" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#F0386B"/></marker>
+      </defs>
+      <g opacity={Math.max(0.18,r0)}>
+        <rect x="40" y="24" width="280" height="56" rx="4" fill="none" stroke={INK} strokeWidth="1.2"/>
+        <text x="56" y="48" fontFamily="JetBrains Mono" fontSize="10" letterSpacing="2" fill={MUTED}>INTERACTION · t</text>
+        <text x="56" y="68" fontFamily="Newsreader" fontSize="14" fill={INK} fontStyle="italic">"Your music taste is incredible."</text>
+        <circle cx="180" cy="105" r={3+r0*2} fill="#F0386B" opacity={r0}/>
+      </g>
+      <g opacity={r1}><path d="M180,110 C180,130 180,140 180,155" stroke={INK} strokeWidth="1.2" fill="none" markerEnd="url(#arrow)"/></g>
+      <g opacity={r1}><rect x="40" y="160" width="280" height="60" rx="30" fill={PERC_BG}/><text x="60" y="184" fontFamily="JetBrains Mono" fontSize="10" letterSpacing="2" fill="#FF6F94">PERCEPTION  x_e,d</text><text x="60" y="206" fontFamily="JetBrains Mono" fontSize="11" fill={PERC_TX}>[music: +0.45, confidence: 0.72]</text></g>
+      <g opacity={Math.max(r1,r2)}><path d="M180,225 C180,245 180,255 180,270" stroke="#F0386B" strokeWidth="1.4" fill="none" markerEnd="url(#arrow-ember)"/></g>
+      <g transform="translate(40,270)" opacity={Math.max(0.2,Math.min(1,r1*1.2))}>
+        <text x="0" y="-8" fontFamily="JetBrains Mono" fontSize="10" letterSpacing="2" fill={MUTED}>BELIEF LAYER  μ_e,d  ·  fast loop</text>
+        <rect x="-4" y="-4" width="288" height="170" fill="none" stroke={INK} strokeOpacity="0.18" strokeWidth="1" rx="3"/>
+        {["music","humor","warmth","patience","wit"].map((label,i)=>{const y=18+i*28,cx=140,b=belief(i),curX=cx+b.current*100,baseX=cx+b.baseline*100,dl=Math.min(curX,baseX),dw=Math.abs(curX-baseX);return(<g key={i}><text x="0" y={y+4} fontFamily="JetBrains Mono" fontSize="10" fill={MUTED2}>{label}</text><line x1="44" y1={y} x2="244" y2={y} stroke={INK} strokeOpacity="0.12" strokeWidth="1"/><line x1={cx} y1={y-5} x2={cx} y2={y+5} stroke={INK} strokeOpacity="0.25" strokeWidth="1"/><rect x={dl} y={y-3} width={dw} height="6" fill="#F0386B" opacity={r3*0.25}/><line x1={baseX} y1={y-6} x2={baseX} y2={y+6} stroke={INK} strokeWidth={r2>0?"1.5":"0"} opacity={r2>0?1:0}/><circle cx={curX} cy={y} r="4" fill="#F0386B" opacity={r2}/></g>);})}
+      </g>
+      <g transform="translate(380,60)" opacity={r4}>
+        <text x="0" y="-12" fontFamily="JetBrains Mono" fontSize="10" letterSpacing="2" fill={MUTED}>RULE B · gate conditions</text>
+        {[{label:"Magnitude",req:"≥ 0.25",state:"PASS"},{label:"Confidence",req:"≥ 0.70",state:"PASS"},{label:"Observations",req:"≥ 10",state:r4>0.7?"PASS":"..."}].map((g,i)=>(
+          <g key={i} transform={`translate(0,${i*56})`}><rect x="0" y="0" width="340" height="44" rx="3" fill="none" stroke={g.state==="PASS"?"#F0386B":INK} strokeOpacity={g.state==="PASS"?"0.7":"0.2"} strokeWidth="1"/><text x="14" y="18" fontFamily="JetBrains Mono" fontSize="10" letterSpacing="1" fill={INK} opacity="0.6">{g.label.toUpperCase()}</text><text x="14" y="34" fontFamily="Newsreader" fontStyle="italic" fontSize="15" fill={INK}>{g.req}</text><text x="326" y="28" textAnchor="end" fontFamily="JetBrains Mono" fontSize="11" fill={g.state==="PASS"?"#F0386B":MUTED} fontWeight={g.state==="PASS"?"500":"400"}>{g.state}</text></g>
+        ))}
+        <g opacity={r5} transform="translate(0,178)"><rect x="0" y="0" width="340" height="40" rx="3" fill="#F0386B"/><text x="170" y="25" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="11" letterSpacing="3" fill="#F4ECDE">REFLECTION TRIGGERED · t = 20</text></g>
+      </g>
+      <g transform="translate(380,320)" opacity={Math.max(0.2,r5*0.6+r4*0.4)}>
+        <text x="0" y="-12" fontFamily="JetBrains Mono" fontSize="10" letterSpacing="2" fill={MUTED}>TRAIT VECTOR  τ_k  ·  slow loop</text>
+        <rect x="-4" y="-4" width="348" height="170" rx="3" fill="#5B3FE0" fillOpacity={dark?"0.10":"0.04"} stroke="#5B3FE0" strokeOpacity="0.3" strokeWidth="1"/>
+        {["openness","candor","warmth","patience","wit"].map((label,i)=>{const y=18+i*28,cx=200,tx=cx+ts(i)*400;return(<g key={i}><text x="0" y={y+4} fontFamily="JetBrains Mono" fontSize="10" fill="#9A7FFF">{label}</text><line x1="80" y1={y} x2="320" y2={y} stroke="#5B3FE0" strokeOpacity={dark?"0.30":"0.15"} strokeWidth="1"/><line x1={cx} y1={y-5} x2={cx} y2={y+5} stroke="#5B3FE0" strokeOpacity="0.45" strokeWidth="1"/><circle cx={cx} cy={y} r="3.5" fill="#9A7FFF" opacity={0.35}/><circle cx={tx} cy={y} r="4" fill="#9A7FFF" opacity={r5}/><line x1={cx} y1={y} x2={tx} y2={y} stroke="#9A7FFF" strokeWidth="1.5" strokeDasharray="2 2" opacity={r5*0.7}/></g>);})}
+        <text x="170" y="160" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="9" letterSpacing="2" fill="#9A7FFF" opacity={r5}>∆ ≤ 0.08 — bounded step</text>
+      </g>
+      <g opacity={r4}><path d="M334,355 C360,355 360,200 380,200" fill="none" stroke={INK} strokeOpacity="0.4" strokeWidth="1" strokeDasharray="3 3"/></g>
+      <g opacity={r5}><path d="M550,260 C550,290 550,300 550,318" stroke="#F0386B" strokeWidth="1.5" fill="none" markerEnd="url(#arrow-ember)"/><text x="558" y="295" fontFamily="JetBrains Mono" fontSize="9" letterSpacing="2" fill="#F0386B">aggregate</text></g>
+      <g opacity={Math.max(0,r5-0.5)*2}><path d="M40,500 L334,500" stroke="#F0386B" strokeWidth="1" strokeDasharray="4 4" opacity="0.6"/><text x="40" y="520" fontFamily="JetBrains Mono" fontSize="10" letterSpacing="2" fill="#F0386B">↻ BASELINE RESET · new epoch begins</text></g>
+    </svg>
+  );
+};
+
+const Diagram=({theme})=>{
+  const stageRef=React.useRef(null);const[progress,setProgress]=React.useState(0);
+  React.useEffect(()=>{const onScroll=()=>{const el=stageRef.current;if(!el)return;const rect=el.getBoundingClientRect(),vh=window.innerHeight,p=Math.max(0,Math.min(1,-rect.top/(rect.height-vh)));setProgress(p);};onScroll();window.addEventListener('scroll',onScroll,{passive:true});return()=>window.removeEventListener('scroll',onScroll);},[]);
+  const scaled=progress*STEPS.length,step=Math.min(STEPS.length-1,Math.floor(scaled)),sub=scaled-step;
+  return(
+    <section className="diagram-section" id="architecture">
+      <div className="container"><div className="diagram-header"><div className="eyebrow" style={{marginBottom:24}}>04 — The architecture</div><h2 className="diagram-title display">Six steps from <em>interaction</em> to <em>identity.</em></h2><p className="diagram-lead">The whole system in one frame. Scroll to walk through it.</p></div></div>
+      <div className="diagram-stage" ref={stageRef}>
+        <div className="diagram-sticky">
+          <div className="diagram-steps">{STEPS.map((s,i)=><div key={s.n} className={"diagram-step "+(i===step?"is-active":"")}><div className="diagram-step-n">Step {s.n}</div><div className="diagram-step-title">{s.title}</div><div className="diagram-step-desc">{s.desc}</div></div>)}</div>
+          <div className="diagram-canvas-wrap"><div className="diagram-canvas"><DiagramCanvas step={step} sub={sub} theme={theme}/></div></div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const USECASES=[
+  {n:"I",h:"AI Influencers",body:"Personas that scale to millions of daily conversations without losing voice. The character on day 1 is the character on day 365 — only deeper.",glyph:"★"},
+  {n:"II",h:"Humanoid Robots",body:"A baseline personality your robot carries from box to home — that remembers people, adapts to context, and never resets to factory-default.",glyph:"◇"},
+  {n:"III",h:"NPCs & Game Agents",body:"Characters with opinions, preferences, and memory across an entire campaign. NPCs that disagree with the player on principle, not on a die roll.",glyph:"▲"},
+  {n:"IV",h:"AI Companions",body:"Companions that hold shape at month 12, not just last Tuesday. Identity that earns trust by surviving thousands of conversations intact.",glyph:"○"},
+  {n:"V",h:"Branded Agents",body:"Customer-facing agents that hold the brand voice under pressure. Different tones for different users; the same identity underneath.",glyph:"▣"},
+  {n:"VI",h:"Home & Ambient AI",body:"Assistants that live with you for years. Their preferences mature alongside yours — not whichever way the wind blew last week.",glyph:"◐"},
+];
+const UseCases=()=>(
+  <section className="section" id="usecases">
+    <div className="container">
+      <div className="eyebrow" style={{marginBottom:24}}>05 — Where it goes</div>
+      <h2 className="usecases-title display">One personality.<br /><em>Any vessel.</em></h2>
+      <p className="usecases-lead">MindForm is a persistent identity that drops in wherever AI needs to feel like <em>someone</em> — not a fresh stranger every conversation.</p>
+      <div className="usecases-grid">{USECASES.map(u=><div className="usecase" key={u.n}><div className="usecase-head"><span className="usecase-num">{u.n}</span><span className="usecase-glyph">{u.glyph}</span></div><h3 className="usecase-h">{u.h}.</h3><p className="usecase-body">{u.body}</p></div>)}</div>
+    </div>
+  </section>
+);
+
+const DIFFS=[
+  {name:"LLM memory",them:{label:"What it does",body:"Remembers facts and preferences across sessions. A growing list of notes about you."},us:{body:"Memory remembers facts. MindForm remembers who the AI is. Identity sits above memory."}},
+  {name:"Frozen personas",them:{label:"How personas work",body:"Personas are frozen at creation — distinctive at turn 1, identical to every other agent by turn 1,000."},us:{body:"Personas evolve through bounded reflection. Distinctive at turn 1. More themselves at turn 10,000."}},
+  {name:"Vanilla LLMs",them:{label:"Default behavior",body:"Mirror the user. Sycophantic by training. No point of view that survives the next prompt."},us:{body:"Hold a position. Update only when evidence clears three thresholds. Disagree on principle."}},
+  {name:"Long-context tricks",them:{label:"The approach",body:"Stuff history into context windows. Hope coherence emerges. Watch it dissolve past 32k tokens."},us:{body:"Two clocks. Bounded steps. A persistent trait vector outside the context — model-agnostic, auditable."}},
+];
+const Differentiation=()=>(
+  <section className="section diff-section" id="differentiation">
+    <div className="container">
+      <div className="eyebrow" style={{marginBottom:24}}>06 — Why memory isn't personality</div>
+      <h2 className="diff-title display">Memory isn't personality.<br />The personality layer is a <em>new layer.</em></h2>
+      <p className="diff-lead">A growing list of facts about a user is not a self. MindForm adds the layer that decides what those facts <em>mean</em> for who the agent is.</p>
+      <div className="diff-rows">{DIFFS.map(d=><div className="diff-row" key={d.name}><div className="diff-row-name">{d.name}.</div><div className="diff-row-them"><div className="diff-label">{d.them.label}</div><div className="diff-body">{d.them.body}</div></div><div className="diff-row-us"><div className="diff-label">+ MindForm</div><div className="diff-body">{d.us.body}</div></div></div>)}</div>
+    </div>
+  </section>
+);
+
+const Research=()=>(
+  <section className="section" id="research">
+    <div className="container">
+      <div className="eyebrow" style={{marginBottom:24}}>07 — Built on research, not vibes</div>
+      <div className="research-grid">
+        <div>
+          <h2 className="research-title display">A <em>two-timescale</em><br />architecture.</h2>
+          <p className="research-lead">MindForm is a memory- and reflection-based architecture that decouples short-term belief plasticity from long-term trait evolution. Validated through a multi-session human evaluation study, model-agnostic by design, and powered by Gemma open models. Open-source at the core.</p>
+          <div className="research-cite-list">
+            <div className="cite"><span className="cite-n">[1]</span><span className="cite-body">Li et al. — A persona-based neural conversation model. <em>ArXiv 1603.06155</em></span></div>
+            <div className="cite"><span className="cite-n">[2]</span><span className="cite-body">Packer et al. — MemGPT: Towards LLMs as operating systems. <em>ArXiv 2310.08560</em></span></div>
+            <div className="cite"><span className="cite-n">[3]</span><span className="cite-body">Park et al. — Generative agents: Interactive simulacra of human behavior. <em>UIST '23</em></span></div>
+            <div className="cite"><span className="cite-n">[4]</span><span className="cite-body">Shinn et al. — Reflexion: language agents with verbal reinforcement learning. <em>NeurIPS '23</em></span></div>
+          </div>
+          <div style={{marginTop:40,display:'flex',gap:14,flexWrap:'wrap'}}>
+            <a href={window.SITE_URLS.console} className="btn">Open the console →</a>
+            <a href={window.SITE_URLS.github} className="btn btn-ghost" target="_blank" rel="noreferrer">github.com/mindform →</a>
+          </div>
+        </div>
+        <div>
+          <div className="paper-card">
+            <div className="paper-stamp">Preprint · 2026</div>
+            <div className="paper-eyebrow">MindForm Labs · Technical paper</div>
+            <h3 className="paper-title">MindForm: A Two-Timescale Architecture for Persistent Personality in LLM Agents</h3>
+            <p className="paper-authors">Hasan Mavlonov, ECUST · Major in Artificial Intelligence</p>
+            <p className="paper-abstract">We propose MindForm, a memory- and reflection-based architecture that decouples short-term belief plasticity from long-term trait evolution. Trait evolution occurs only when drift satisfies tri-fold criteria of magnitude, confidence, and observation count, ensuring updates are bounded and stepwise. Perception extraction is performed by Gemma open models.</p>
+            <div className="paper-stats">
+              <div className="paper-stat"><div className="paper-stat-n">10</div><div className="paper-stat-l">Participants in human eval</div></div>
+              <div className="paper-stat"><div className="paper-stat-n">7/7</div><div className="paper-stat-l">Sessions with high retrieval</div></div>
+              <div className="paper-stat"><div className="paper-stat-n">0</div><div className="paper-stat-l">Hallucinations on null-belief probes</div></div>
+            </div>
+          </div>
+          <div style={{marginTop:28,padding:'20px 24px',border:'1px solid var(--hairline)',borderRadius:4,background:'var(--belief-tint)'}}>
+            <div style={{fontFamily:'var(--mono)',fontSize:11,letterSpacing:'0.16em',textTransform:'uppercase',color:'var(--belief)',marginBottom:8}}>Notable finding</div>
+            <div style={{fontFamily:'var(--serif-display)',fontSize:22,lineHeight:1.15,fontStyle:'italic',color:'var(--ink)'}}>
+              "The agent did not parrot user inputs. Beliefs were filtered through the trait vector — producing responses that reflected both memory and personality."
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+const FutureCTA=()=>(
+  <section className="future-cta" id="future">
+    <div className="container">
+      <span className="eyebrow">08 — The future of AI agents</span>
+      <h2 className="display">The next decade of AI<br />won't be smarter.<br />It will be <em>someone.</em></h2>
+      <p>Capability is converging. Identity is the frontier. The agents people trust for years will be the ones that stay recognizably themselves — and MindForm is the layer that makes that possible.</p>
+      <div className="cta-row">
+        <a href={window.SITE_URLS.talk} className="btn">Talk to an agent →</a>
+        <a href={window.SITE_URLS.console} className="btn btn-line">Open the console</a>
+      </div>
+    </div>
+  </section>
+);
+
+const Footer=()=>{
+  const urls=window.SITE_URLS;
+  return(
+    <footer className="footer" id="contact">
+      <div className="container">
+        <h2 className="footer-tagline display">AI becomes<br /><em>someone.</em></h2>
+        <div className="footer-row">
+          <div className="footer-col"><h5>Product</h5><ul><li><a href="#architecture">Architecture</a></li><li><a href="#demo">Live demo</a></li><li><a href={urls.console}>Console</a></li><li><a href={urls.talk}>Talk</a></li></ul></div>
+          <div className="footer-col"><h5>Engine</h5><ul><li><a href={urls.persona}>Persona viewer</a></li><li><a href={urls.memory}>Memory viewer</a></li><li><a href={urls.interactive}>Interactive test</a></li><li><a href={urls.evaluation}>Evaluation</a></li></ul></div>
+          <div className="footer-col"><h5>Research</h5><ul><li><a href="#research">The architecture</a></li><li><a href={urls.github} target="_blank" rel="noreferrer">Open source</a></li><li><a href="#differentiation">Why not memory</a></li><li><a href="#problem">The problem</a></li></ul></div>
+          <div className="footer-col"><h5>Ecosystem</h5><ul><li><a href={urls.gemma} target="_blank" rel="noreferrer">Gemma</a></li><li><a href="https://aistudio.google.com" target="_blank" rel="noreferrer">Google AI Studio</a></li><li><a href="https://ai.google.dev" target="_blank" rel="noreferrer">Google AI</a></li><li><a href="mailto:hello@mindform.ai">hello@mindform.ai</a></li></ul></div>
+        </div>
+        <div className="footer-meta"><span>© 2026 MindForm Labs</span><span>Personality layer for AI · Built on Gemma</span></div>
+      </div>
+    </footer>
+  );
+};
+
+const App=()=>{
+  const [theme, toggleTheme] = useTheme();
+  return (
+    <React.Fragment>
+      <a href="#main" className="skip-link">Skip to content</a>
+      <Nav theme={theme} onToggleTheme={toggleTheme} />
+      <main id="main"><Hero/><Problem/><Pillars/><Demo/><Diagram theme={theme} /><UseCases/><Differentiation/><Research/><FutureCTA/></main>
+      <Footer/>
+    </React.Fragment>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+
+</script>{% endverbatim %}
+</body>
+</html>

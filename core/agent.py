@@ -15,13 +15,14 @@ from __future__ import annotations
 from typing import Any, Dict, List
 
 from .consolidation import ConsolidationEngine
+from .llm import DEFAULT_MODEL
 from .perception import PerceptionEngine
 from .reflection import ReflectionEngine
 from .state_manager import StateManager
 
 
 class Agent:
-    def __init__(self, root_dir: str, model: str = "gpt-4.1-mini"):
+    def __init__(self, root_dir: str, model: str = DEFAULT_MODEL):
         self.root_dir = root_dir
         self.state = StateManager(root_dir)
 

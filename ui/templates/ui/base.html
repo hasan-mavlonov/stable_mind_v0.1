@@ -3,22 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StableMind UI</title>
+    <title>{% block title %}MindForm Console{% endblock %}</title>
+    <meta name="description" content="MindForm Console — run the personality engine: create personas, talk to agents, inspect beliefs, traits, and memory.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231A0E2E'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23F0386B'/%3E%3C/svg%3E">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="h-full text-slate-100">
+<body class="h-full bg-slate-950 text-slate-100">
     <div class="min-h-full">
         <header class="sticky top-0 z-30 border-b border-slate-800 bg-slate-950/95 backdrop-blur">
-            <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-                <a href="/" class="text-lg font-semibold tracking-tight text-cyan-300">StableMind</a>
-                <nav class="flex flex-wrap items-center gap-2 text-sm">
-                    <a class="rounded-md px-3 py-1.5 hover:bg-slate-800" href="/">Home</a>
-                    <a class="rounded-md px-3 py-1.5 hover:bg-slate-800" href="/create-persona/">Create Persona</a>
-                    <a class="rounded-md px-3 py-1.5 hover:bg-slate-800" href="/talk/">Talk</a>
-                    <a class="rounded-md px-3 py-1.5 hover:bg-slate-800" href="/interactive-test/">Interactive Test</a>
-                    <a class="rounded-md px-3 py-1.5 hover:bg-slate-800" href="/persona/">Persona</a>
-                    <a class="rounded-md px-3 py-1.5 hover:bg-slate-800" href="/memory/">Memory</a>
-                    <a class="rounded-md px-3 py-1.5 hover:bg-slate-800" href="/evaluation/">Evaluation</a>
+            <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+                <a href="{% url 'landing' %}" class="flex items-center gap-2 text-lg font-semibold tracking-tight">
+                    <span class="inline-block h-2.5 w-2.5 rounded-full bg-rose-500 shadow-[0_0_10px_#F0386B]"></span>
+                    <span class="text-slate-100">MindForm</span>
+                    <span class="ml-1 rounded-md border border-slate-700 px-2 py-0.5 text-[10px] uppercase tracking-[0.18em] text-slate-400">Console</span>
+                </a>
+                <nav class="flex flex-wrap items-center gap-1 text-sm">
+                    <a class="rounded-md px-3 py-1.5 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'landing' %}">← Site</a>
+                    <a class="rounded-md px-3 py-1.5 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'console' %}">Console</a>
+                    <a class="rounded-md px-3 py-1.5 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'create_persona' %}">Create Persona</a>
+                    <a class="rounded-md px-3 py-1.5 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'talk' %}">Talk</a>
+                    <a class="rounded-md px-3 py-1.5 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'interactive_test' %}">Interactive Test</a>
+                    <a class="rounded-md px-3 py-1.5 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'persona' %}">Persona</a>
+                    <a class="rounded-md px-3 py-1.5 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'memory' %}">Memory</a>
+                    <a class="rounded-md px-3 py-1.5 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'evaluation_session' %}">Evaluation</a>
                 </nav>
             </div>
         </header>
@@ -26,6 +33,12 @@
         <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
             {% block content %}{% endblock %}
         </main>
+
+        <footer class="mx-auto max-w-7xl px-4 pb-10 pt-6 sm:px-6 lg:px-8">
+            <p class="border-t border-slate-800 pt-6 text-xs uppercase tracking-[0.16em] text-slate-500">
+                MindForm · The personality layer for AI agents · Powered by Gemma
+            </p>
+        </footer>
     </div>
 </body>
 </html>

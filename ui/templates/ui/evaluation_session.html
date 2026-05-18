@@ -20,7 +20,7 @@
                 {% csrf_token %}
                 <input type="hidden" name="action" value="start">
                 <input required name="participant_id" placeholder="Participant ID" class="w-full rounded-lg border border-slate-700 bg-slate-950 p-2">
-                <input required name="condition" placeholder="Condition (stablemind/baseline)" class="w-full rounded-lg border border-slate-700 bg-slate-950 p-2">
+                <input required name="condition" placeholder="Condition (mindform/baseline)" class="w-full rounded-lg border border-slate-700 bg-slate-950 p-2">
                 <input name="session_order" placeholder="Session order (optional)" class="w-full rounded-lg border border-slate-700 bg-slate-950 p-2">
                 <textarea name="notes" placeholder="Notes (optional)" class="w-full rounded-lg border border-slate-700 bg-slate-950 p-2"></textarea>
                 <button type="submit" class="rounded-lg bg-cyan-500 px-4 py-2 font-semibold text-slate-950 hover:bg-cyan-400">Start Session</button>
