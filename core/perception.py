@@ -79,6 +79,7 @@ class PerceptionEngine:
             prompt,
             model=self.model,
             temperature=0.2,
+            max_output_tokens=1024,
         )
 
         args = self._parse_json(raw_text)

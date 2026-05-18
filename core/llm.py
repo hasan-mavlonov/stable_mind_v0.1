@@ -22,11 +22,12 @@ Environment variables (see .env.example):
     GEMMA_API_KEY          Primary key from https://aistudio.google.com/apikey
     GOOGLE_API_KEY         Accepted fallback
     GOOGLE_AI_STUDIO_KEY   Accepted fallback
-    MINDFORM_MODEL         Default Gemma model (default: gemma-3-27b-it)
+    MINDFORM_MODEL         Default Google model (default: gemini-2.5-flash-lite)
 """
 
 from __future__ import annotations
 
+import functools
 import importlib
 import os
 from typing import Optional
@@ -35,7 +36,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DEFAULT_MODEL = os.getenv("MINDFORM_MODEL", "gemma-3-27b-it")
+# gemini-2.5-flash-lite is Google's lowest-latency text model. It is the
+# fastest sensible default for MindForm's short extraction / rephrasing
+# calls; heavier models (gemini-2.5-pro) add several seconds per turn.
+DEFAULT_MODEL = os.getenv("MINDFORM_MODEL", "gemini-2.5-flash-lite")
 
 _API_KEY_VARS = (
     "GEMMA_API_KEY",
@@ -54,10 +58,18 @@ def resolve_api_key() -> Optional[str]:
     return None
 
 
+@functools.lru_cache(maxsize=1)
+def _build_client(api_key: str):
+    genai = importlib.import_module("google.genai")
+    return genai.Client(api_key=api_key)
+
+
 def get_client():
     """
-    Build a Google GenAI client bound to the Gemma ecosystem.
+    Return a cached Google GenAI client.
 
+    The client is built once per process and reused: rebuilding it on
+    every call added avoidable connection-setup latency to each turn.
     Raises a clear, actionable error if no key is configured so the
     MindForm UI can surface setup instructions instead of a stack trace.
     """
@@ -69,8 +81,15 @@ def get_client():
             "https://aistudio.google.com/apikey"
         )
 
-    genai = importlib.import_module("google.genai")
-    return genai.Client(api_key=api_key)
+    return _build_client(api_key)
+
+
+def _thinking_can_be_disabled(model_name: str) -> bool:
+    # The Gemini 2.5 Flash family supports thinking_budget=0 to skip the
+    # internal "thinking" pass entirely — the single biggest latency win
+    # for short, low-creativity calls. gemini-2.5-pro cannot disable it,
+    # and Gemma models reject the field, so only opt in for flash models.
+    return model_name.lower().startswith("gemini-2.5-flash")
 
 
 def generate_text(
@@ -79,21 +98,41 @@ def generate_text(
     model: Optional[str] = None,
     system: Optional[str] = None,
     temperature: float = 0.4,
+    max_output_tokens: Optional[int] = None,
 ) -> str:
     """
-    Generate text with a Gemma model.
+    Generate text with a Google model.
 
-    Gemma models exposed through the Gemini API do not take a separate
-    system role, so any system guidance is folded into the prompt.
+    Models exposed through the Gemini API do not take a separate system
+    role, so any system guidance is folded into the prompt.
     """
     client = get_client()
 
+    model_name = model or DEFAULT_MODEL
     contents = prompt if not system else f"{system}\n\n{prompt}"
 
-    response = client.models.generate_content(
-        model=model or DEFAULT_MODEL,
-        contents=contents,
-        config={"temperature": temperature},
-    )
+    config: dict = {"temperature": temperature}
+    if max_output_tokens is not None:
+        config["max_output_tokens"] = max_output_tokens
+    if _thinking_can_be_disabled(model_name):
+        config["thinking_config"] = {"thinking_budget": 0}
+
+    try:
+        response = client.models.generate_content(
+            model=model_name,
+            contents=contents,
+            config=config,
+        )
+    except Exception:
+        # If a swapped-in model rejects thinking_config, retry once
+        # without it rather than failing the whole turn.
+        if "thinking_config" not in config:
+            raise
+        config.pop("thinking_config", None)
+        response = client.models.generate_content(
+            model=model_name,
+            contents=contents,
+            config=config,
+        )
 
     return (getattr(response, "text", "") or "").strip()
