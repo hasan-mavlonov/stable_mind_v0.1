@@ -92,6 +92,24 @@ def _thinking_can_be_disabled(model_name: str) -> bool:
     return model_name.lower().startswith("gemini-2.5-flash")
 
 
+def _response_text(response) -> str:
+    # response.text can raise or return None when a candidate has no text
+    # parts (e.g. it was truncated before producing any output).
+    try:
+        text = response.text
+    except Exception:
+        text = None
+    return (text or "").strip()
+
+
+def _finish_reason(response) -> str:
+    try:
+        reason = response.candidates[0].finish_reason
+    except Exception:
+        return ""
+    return getattr(reason, "name", str(reason or "")).upper()
+
+
 def generate_text(
     prompt: str,
     *,
@@ -105,34 +123,46 @@ def generate_text(
 
     Models exposed through the Gemini API do not take a separate system
     role, so any system guidance is folded into the prompt.
+
+    `max_output_tokens` is treated as a speed optimization, not a hard
+    contract: if it (combined with a model that still "thinks", e.g.
+    gemini-2.5-pro) truncates the answer to empty, the call is retried
+    once without the cap so the feature keeps working.
     """
     client = get_client()
 
     model_name = model or DEFAULT_MODEL
     contents = prompt if not system else f"{system}\n\n{prompt}"
+    thinking_off = _thinking_can_be_disabled(model_name)
 
-    config: dict = {"temperature": temperature}
-    if max_output_tokens is not None:
-        config["max_output_tokens"] = max_output_tokens
-    if _thinking_can_be_disabled(model_name):
-        config["thinking_config"] = {"thinking_budget": 0}
+    def _call(cap: Optional[int]) -> str:
+        config: dict = {"temperature": temperature}
+        if cap is not None:
+            config["max_output_tokens"] = cap
+        if thinking_off:
+            config["thinking_config"] = {"thinking_budget": 0}
 
-    try:
-        response = client.models.generate_content(
-            model=model_name,
-            contents=contents,
-            config=config,
-        )
-    except Exception:
-        # If a swapped-in model rejects thinking_config, retry once
-        # without it rather than failing the whole turn.
-        if "thinking_config" not in config:
-            raise
-        config.pop("thinking_config", None)
-        response = client.models.generate_content(
-            model=model_name,
-            contents=contents,
-            config=config,
-        )
+        try:
+            response = client.models.generate_content(
+                model=model_name, contents=contents, config=config
+            )
+        except Exception:
+            # If a swapped-in model rejects thinking_config, retry once
+            # without it rather than failing the whole turn.
+            if "thinking_config" not in config:
+                raise
+            config.pop("thinking_config", None)
+            response = client.models.generate_content(
+                model=model_name, contents=contents, config=config
+            )
 
-    return (getattr(response, "text", "") or "").strip()
+        return _response_text(response), _finish_reason(response)
+
+    text, finish = _call(max_output_tokens)
+
+    # A reasoning model can burn the whole cap on internal thinking and
+    # return nothing; lift the cap once so the answer survives.
+    if max_output_tokens is not None and (not text or finish == "MAX_TOKENS"):
+        text, _ = _call(None)
+
+    return text

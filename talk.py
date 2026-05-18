@@ -219,7 +219,7 @@ class LLM:
             model=self.model,
             system=instructions,
             temperature=0.0,
-            max_output_tokens=32,
+            max_output_tokens=64,
         ).strip()
 
         if text.upper() == "NONE":
@@ -269,7 +269,7 @@ class LLM:
             model=self.model,
             system=instructions,
             temperature=0.4,
-            max_output_tokens=512,
+            max_output_tokens=768,
         ).strip()
 
         return output or NO_BELIEF_LINE
