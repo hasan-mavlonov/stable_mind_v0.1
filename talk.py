@@ -23,6 +23,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 import os
+import re
 import json
 from dotenv import load_dotenv
 
@@ -185,6 +186,56 @@ def belief_facts_to_plain_statements(facts: List[BeliefFact]) -> List[str]:
 # LLM helpers
 # ----------------------------
 
+def _norm(s: str) -> str:
+    return " ".join(str(s).strip().lower().split())
+
+
+def match_known_pair(
+    raw: str,
+    known_pairs: List[Tuple[str, str]],
+) -> Optional[Tuple[str, str]]:
+    """
+    Map a model's free-form reply to one of the known (entity_type, entity)
+    pairs, or None.
+
+    Small models routinely wrap the answer in the menu's own bullet format
+    ("- place:the park"), code fences, quotes, or a trailing explanation.
+    The old code required the reply to *equal* "etype:entity" exactly, so
+    any of those decorations made every question fall through to the
+    "no belief" line even though the belief existed. We instead look for a
+    known pair *inside* the reply, which stays safe (only ever returns a
+    pair that already exists) while tolerating formatting noise.
+    """
+    if not raw:
+        return None
+
+    lookup = {(_norm(et), _norm(en)): (et, en) for et, en in known_pairs}
+
+    # Strip markdown code fences, then scan line by line for an exact
+    # "etype:entity" after removing list markers / quotes / backticks.
+    cleaned = re.sub(r"```[a-zA-Z0-9]*", " ", raw).replace("```", " ")
+    for line in cleaned.splitlines():
+        token = line.strip().strip("`'\"").lstrip("-*•>0123456789.) \t").strip()
+        if token.upper() == "NONE":
+            return None
+        if ":" not in token:
+            continue
+        lt, rt = token.split(":", 1)
+        key = (_norm(lt), _norm(rt))
+        if key in lookup:
+            return lookup[key]
+
+    # Fallback: find any known "etype:entity" as a substring of the reply.
+    # Prefer the longest pair so e.g. "park" can't shadow "the park".
+    flat = _norm(raw)
+    best = None
+    for (net, nen), pair in lookup.items():
+        needle = f"{net}:{nen}"
+        if needle in flat and (best is None or len(needle) > best[0]):
+            best = (len(needle), pair)
+    return best[1] if best else None
+
+
 class LLM:
     def __init__(self, model: str = DEFAULT_MODEL):
         self.model = model
@@ -200,15 +251,14 @@ class LLM:
         If it can't confidently select, return None.
         """
         known_pairs = sorted({(entity_type, entity) for (entity_type, entity, _dim) in known_keys})
-        menu = "\n".join([f"- {entity_type}:{entity}" for entity_type, entity in known_pairs[:400]])
+        menu = "\n".join([f"{entity_type}:{entity}" for entity_type, entity in known_pairs[:400]])
 
         instructions = (
             "You are selecting which known entity the user is asking about.\n"
-            "You MUST select exactly one item from the provided list, or reply with NONE.\n"
-            "Return ONLY one line in one of these formats:\n"
-            "1) etype:entity\n"
-            "2) NONE\n"
-            "No extra words.\n\n"
+            "Select exactly one item from the list, or reply with NONE.\n"
+            "Reply with ONLY the chosen item copied verbatim as etype:entity\n"
+            "(or the single word NONE). No bullets, quotes, code fences, or\n"
+            "explanation.\n\n"
             "Selection rules:\n"
             "- If the user question clearly refers to one entity in the list, pick it.\n"
             "- If ambiguous or not present, return NONE.\n"
@@ -220,22 +270,9 @@ class LLM:
             system=instructions,
             temperature=0.0,
             max_output_tokens=64,
-        ).strip()
+        )
 
-        if text.upper() == "NONE":
-            return None
-
-        if ":" not in text:
-            return None
-
-        entity_type, entity = text.split(":", 1)
-        entity_type = entity_type.strip()
-        entity = entity.strip()
-
-        if (entity_type, entity) not in set(known_pairs):
-            return None
-
-        return (entity_type, entity)
+        return match_known_pair(text, known_pairs)
 
     def rewrite_in_tone(
         self,
