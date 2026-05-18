@@ -1,27 +1,31 @@
 {% extends "ui/base.html" %}
 
+{% block title %}Persona · MindForm Console{% endblock %}
+
 {% block content %}
-<section class="space-y-6">
+<section class="stack">
     <div>
-        <h1 class="text-3xl font-bold">Persona Viewer</h1>
-        <p class="mt-2 text-slate-300">Current immutable, stable, and dynamic persona state.</p>
+        <p class="eyebrow">State</p>
+        <h1 class="page-h">Persona Viewer</h1>
+        <p class="lead">The current immutable, stable, and dynamic persona state.</p>
     </div>
 
-    <div class="grid gap-6 lg:grid-cols-3">
-        <article class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-            <h2 class="text-lg font-semibold text-cyan-300">Immutable</h2>
-            <pre class="mt-3 overflow-x-auto rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm">{{ immutable|pprint }}</pre>
-        </article>
+    <div class="panel">
+        <h2 class="panel-h">Immutable</h2>
+        <p class="panel-sub">Fixed identity — never changes.</p>
+        <pre>{{ immutable|pprint }}</pre>
+    </div>
 
-        <article class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-            <h2 class="text-lg font-semibold text-cyan-300">Stable</h2>
-            <pre class="mt-3 overflow-x-auto rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm">{{ stable|pprint }}</pre>
-        </article>
+    <div class="panel">
+        <h2 class="panel-h">Stable</h2>
+        <p class="panel-sub">Slow-moving traits and beliefs.</p>
+        <pre>{{ stable|pprint }}</pre>
+    </div>
 
-        <article class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-            <h2 class="text-lg font-semibold text-cyan-300">Dynamic</h2>
-            <pre class="mt-3 overflow-x-auto rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm">{{ dynamic|pprint }}</pre>
-        </article>
+    <div class="panel">
+        <h2 class="panel-h">Dynamic</h2>
+        <p class="panel-sub">Fast-moving mood and working memory.</p>
+        <pre>{{ dynamic|pprint }}</pre>
     </div>
 </section>
 {% endblock %}

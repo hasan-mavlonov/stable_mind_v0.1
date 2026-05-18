@@ -3,43 +3,49 @@
 {% block title %}Talk · MindForm Console{% endblock %}
 
 {% block content %}
-<section class="mx-auto max-w-4xl rounded-2xl border border-slate-800 bg-slate-900 p-8">
-    <h1 class="text-2xl font-bold">Talk with MindForm</h1>
-    <p class="mt-2 text-slate-300">Ask Rin about existing beliefs and memory.</p>
+<section style="max-width:760px;">
+    <p class="eyebrow">Conversational interface</p>
+    <h1 class="page-h">Talk with MindForm</h1>
+    <p class="lead">Ask the agent about beliefs it already holds. Answers are rephrased from existing state — no new facts are invented.</p>
 
-    {% if active_evaluation_session %}
-        <div class="mt-3 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm text-emerald-300">Logging to active session: {{ active_evaluation_session.participant_id }} ({{ active_evaluation_session.condition }})</div>
-    {% endif %}
-
-    <form method="post" class="mt-6 space-y-3">
-        {% csrf_token %}
+    <div class="panel stack" style="margin-top:32px;">
         {% if active_evaluation_session %}
-            <div>
-                <label class="mb-1 block text-sm text-slate-300">Evaluation phase</label>
-                <select name="evaluation_phase" class="w-full rounded-lg border border-slate-700 bg-slate-950 p-2">
-                    {% for phase in evaluation_phases %}
-                        <option value="{{ phase }}" {% if selected_phase == phase %}selected{% endif %}>{{ phase }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+            <div class="note note-info">Logging to active session: {{ active_evaluation_session.participant_id }} ({{ active_evaluation_session.condition }})</div>
         {% endif %}
-        <textarea class="min-h-40 w-full rounded-lg border border-slate-700 bg-slate-950 p-3 text-slate-100 outline-none ring-cyan-400 focus:ring" name="message" placeholder="Type your message...">{% if user_text %}{{ user_text }}{% endif %}</textarea>
-        <button class="rounded-lg bg-cyan-500 px-4 py-2 font-semibold text-slate-950 hover:bg-cyan-400" type="submit">Send</button>
-    </form>
 
-    {% if error %}
-        <div class="mt-6 rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-rose-300">{{ error }}</div>
-    {% endif %}
+        <form method="post" class="stack">
+            {% csrf_token %}
+            {% if active_evaluation_session %}
+                <div class="field">
+                    <label>Evaluation phase</label>
+                    <select name="evaluation_phase">
+                        {% for phase in evaluation_phases %}
+                            <option value="{{ phase }}" {% if selected_phase == phase %}selected{% endif %}>{{ phase }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            {% endif %}
+            <div class="field">
+                <label>Your message</label>
+                <textarea name="message" placeholder="Type your message…">{% if user_text %}{{ user_text }}{% endif %}</textarea>
+            </div>
+            <button class="btn btn-primary" type="submit">Send</button>
+        </form>
+
+        {% if error %}
+            <div class="note note-err">{{ error }}</div>
+        {% endif %}
+    </div>
 
     {% if answer %}
-        <div class="mt-6 space-y-4">
-            <div class="rounded-xl border border-slate-700 bg-slate-950 p-4">
-                <h2 class="text-sm font-semibold uppercase tracking-wide text-cyan-300">You</h2>
-                <p class="mt-1 whitespace-pre-wrap">{{ user_text }}</p>
+        <div class="stack" style="margin-top:24px;">
+            <div class="bubble">
+                <div class="bubble-h">You</div>
+                <p>{{ user_text }}</p>
             </div>
-            <div class="rounded-xl border border-slate-700 bg-slate-950 p-4">
-                <h2 class="text-sm font-semibold uppercase tracking-wide text-cyan-300">Rin</h2>
-                <p class="mt-1 whitespace-pre-wrap">{{ answer }}</p>
+            <div class="bubble">
+                <div class="bubble-h">Agent</div>
+                <p>{{ answer }}</p>
             </div>
         </div>
     {% endif %}
