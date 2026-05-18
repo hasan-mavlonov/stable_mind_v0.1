@@ -16,12 +16,13 @@ from __future__ import annotations
 from dotenv import load_dotenv
 load_dotenv()
 
-import os
 import json
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List
-import importlib
+
+from .llm import DEFAULT_MODEL, generate_text
 
 
 @dataclass
@@ -48,12 +49,9 @@ class PerceptionEngine:
 
     TOOL_NAME = "extract_perceptions"
 
-    def __init__(self, root_dir: str, model: str = "gpt-4.1"):
+    def __init__(self, root_dir: str, model: str = DEFAULT_MODEL):
         self.root = Path(root_dir)
         self.model = model
-
-        openai_module = importlib.import_module("openai")
-        self.client = openai_module.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
         self.ontology = self._read_json(self.root / "config" / "ontology.json")
         self.mem_path = self.root / "memory" / "perceptions.jsonl"
@@ -66,19 +64,24 @@ class PerceptionEngine:
     def analyze(self, user_text: str, session_id: str = "default") -> PerceptionResult:
         turn = self._next_turn()
 
-        tool_schema = self._build_tool_schema()
         instructions = self._build_instructions()
+        schema_hint = self._build_schema_hint()
 
-        response = self.client.responses.create(
+        prompt = (
+            f"{instructions}\n\n"
+            f"{schema_hint}\n\n"
+            "Return ONLY a single JSON object, no prose, no markdown fences.\n\n"
+            f"Input: {user_text}\n"
+            "Return:"
+        )
+
+        raw_text = generate_text(
+            prompt,
             model=self.model,
-            instructions=instructions,
-            input=user_text,
-            tools=[tool_schema],
-            tool_choice={"type": "function", "name": self.TOOL_NAME},
             temperature=0.2,
         )
 
-        args = self._extract_function_args(response)
+        args = self._parse_json(raw_text)
         args = self._validate_tool_args_shape(args)
         entities = self._normalize_entities(args)
 
@@ -96,80 +99,30 @@ class PerceptionEngine:
             entities=entities,
         )
 
-    # ---------- tool schema ----------
+    # ---------- schema hint ----------
 
-    def _build_tool_schema(self) -> Dict[str, Any]:
+    def _build_schema_hint(self) -> str:
         """
-        OpenAI tool-parameter JSON schema is a restricted subset.
-        Use an array of (dimension, value) objects (not open-ended dict).
+        Describe the exact JSON contract for the Gemma model, including the
+        ontology-allowed entity types and their permitted dimensions.
         """
         entity_types = self.ontology.get("entity_types", {})
-        allowed_types = sorted(entity_types.keys())
 
-        dim_item_props = {
-            "dimension": {"type": "string"},
-            "value": {"type": "number", "minimum": -1.0, "maximum": 1.0},
-        }
+        lines: List[str] = ["Allowed entity types and their dimensions:"]
+        for et in sorted(entity_types.keys()):
+            dims = sorted((entity_types[et].get("dimensions") or {}).keys())
+            lines.append(f"- {et}: {', '.join(dims) if dims else '(none)'}")
 
-        item_properties = {
-            "entity_type": {
-                "type": "string",
-                "enum": allowed_types,
-                "description": "Must be one of the known entity types from ontology."
-            },
-            "entity": {
-                "type": "string",
-                "description": "Name of the entity mentioned in text."
-            },
-            "dimensions": {
-                "type": "array",
-                "description": (
-                    "List of dimension ratings supported by the text. "
-                    "If an entity is returned, include at least one item."
-                ),
-                "items": {
-                    "type": "object",
-                    "properties": dim_item_props,
-                    "required": list(dim_item_props.keys()),
-                    "additionalProperties": False,
-                },
-            },
-            "confidence": {
-                "type": "number",
-                "minimum": 0.0,
-                "maximum": 1.0,
-                "description": "Confidence in this extraction."
-            },
-        }
+        ontology_block = "\n".join(lines)
 
-        schema = {
-            "type": "object",
-            "properties": {
-                "entities": {
-                    "type": "array",
-                    "description": "List of extracted entity perceptions.",
-                    "items": {
-                        "type": "object",
-                        "properties": item_properties,
-                        "required": list(item_properties.keys()),
-                        "additionalProperties": False,
-                    },
-                }
-            },
-            "required": ["entities"],
-            "additionalProperties": False,
-        }
-
-        return {
-            "type": "function",
-            "name": self.TOOL_NAME,
-            "description": (
-                "Extract evaluated entities and supported dimension ratings from text. "
-                "Only use entity types and dimensions defined in ontology."
-            ),
-            "parameters": schema,
-            "strict": True,
-        }
+        return (
+            f"{ontology_block}\n\n"
+            "JSON contract (return exactly this shape):\n"
+            '{"entities":[{"entity_type":"<one of the allowed types>",'
+            '"entity":"<name>","dimensions":[{"dimension":"<allowed dimension>",'
+            '"value":<float in [-1,1]>}],"confidence":<float in [0,1]>}]}\n'
+            'If nothing is supported, return {"entities":[]}.'
+        )
 
     def _build_instructions(self) -> str:
         """
@@ -241,35 +194,35 @@ class PerceptionEngine:
 
     # ---------- parsing ----------
 
-    def _extract_function_args(self, response: Any) -> Dict[str, Any]:
-        def _parse_args(raw_args: Any) -> Dict[str, Any]:
-            if isinstance(raw_args, dict):
-                return raw_args
-            if isinstance(raw_args, str):
-                try:
-                    return json.loads(raw_args)
-                except Exception:
-                    return {"entities": []}
+    def _parse_json(self, text: str) -> Dict[str, Any]:
+        """
+        Parse the Gemma model's JSON response defensively. Tolerates
+        markdown code fences and surrounding prose; falls back to an
+        empty perception set on any failure.
+        """
+        if not text:
             return {"entities": []}
 
-        for item in getattr(response, "output", []) or []:
-            item_type = getattr(item, "type", None)
+        cleaned = text.strip()
 
-            if item_type in {"function_call", "tool_call"}:
-                if getattr(item, "name", None) == self.TOOL_NAME:
-                    return _parse_args(getattr(item, "arguments", "{}"))
-
-            content = getattr(item, "content", []) or []
-            for c in content:
-                if getattr(c, "type", None) in {"function_call", "tool_call"}:
-                    if getattr(c, "name", None) == self.TOOL_NAME:
-                        return _parse_args(getattr(c, "arguments", "{}"))
+        fence = re.search(r"```(?:json)?\s*(.*?)\s*```", cleaned, re.DOTALL)
+        if fence:
+            cleaned = fence.group(1).strip()
 
         try:
-            text = response.output_text
-            return json.loads(text)
+            return json.loads(cleaned)
         except Exception:
-            return {"entities": []}
+            pass
+
+        start = cleaned.find("{")
+        end = cleaned.rfind("}")
+        if start != -1 and end != -1 and end > start:
+            try:
+                return json.loads(cleaned[start:end + 1])
+            except Exception:
+                pass
+
+        return {"entities": []}
 
     def _validate_tool_args_shape(self, args: Dict[str, Any]) -> Dict[str, Any]:
         ents = args.get("entities", [])

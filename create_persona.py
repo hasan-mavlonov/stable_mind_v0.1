@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Create a fresh StableMind persona from scratch.
+Create a fresh MindForm persona from scratch.
 
 CLI usage:
     python create_persona.py --root .
@@ -165,7 +165,7 @@ def build_counters() -> Dict[str, Any]:
 
 def create_persona(root: Path) -> None:
     """
-    Create or reset the StableMind persona/state files under the given root.
+    Create or reset the MindForm persona/state files under the given root.
     """
     root = root.resolve()
 

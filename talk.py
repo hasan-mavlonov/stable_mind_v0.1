@@ -22,11 +22,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
-import importlib
-import json
 import os
 
 from dotenv import load_dotenv
+
+from core.llm import DEFAULT_MODEL, generate_text
 
 load_dotenv()
 
@@ -186,14 +186,7 @@ def belief_facts_to_plain_statements(facts: List[BeliefFact]) -> List[str]:
 # ----------------------------
 
 class LLM:
-    def __init__(self, model: str = "gpt-4.1-mini"):
-        openai_module = importlib.import_module("openai")
-        api_key = os.getenv("OPENAI_API_KEY")
-
-        if not api_key:
-            raise RuntimeError("OPENAI_API_KEY is not set in the environment.")
-
-        self.client = openai_module.OpenAI(api_key=api_key)
+    def __init__(self, model: str = DEFAULT_MODEL):
         self.model = model
 
     def classify_target(
@@ -221,14 +214,13 @@ class LLM:
             "- If ambiguous or not present, return NONE.\n"
         )
 
-        response = self.client.responses.create(
+        text = generate_text(
+            f"User: {user_text}\n\nKnown entities:\n{menu}\n",
             model=self.model,
-            instructions=instructions,
-            input=f"User: {user_text}\n\nKnown entities:\n{menu}\n",
+            system=instructions,
             temperature=0.0,
-        )
+        ).strip()
 
-        text = (response.output_text or "").strip()
         if text.upper() == "NONE":
             return None
 
@@ -271,14 +263,13 @@ class LLM:
 
         facts_block = "\n".join(facts_lines)
 
-        response = self.client.responses.create(
+        output = generate_text(
+            f"User asked: {user_text}\n\nAvailable beliefs:\n{facts_block}\n",
             model=self.model,
-            instructions=instructions,
-            input=f"User asked: {user_text}\n\nAvailable beliefs:\n{facts_block}\n",
+            system=instructions,
             temperature=0.4,
-        )
+        ).strip()
 
-        output = (response.output_text or "").strip()
         return output or NO_BELIEF_LINE
 
 
@@ -334,7 +325,7 @@ def answer_user_message(user_text: str, root: Optional[Path] = None) -> str:
     if not known_keys:
         return NO_BELIEF_LINE
 
-    llm = LLM(model=os.getenv("TALK_MODEL", "gpt-4.1-mini"))
+    llm = LLM(model=os.getenv("TALK_MODEL", DEFAULT_MODEL))
 
     target = llm.classify_target(cleaned_user_text, known_keys)
     if not target:

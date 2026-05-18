@@ -6,16 +6,17 @@ import json
 from typing import Any, Dict
 
 from core.agent import Agent
+from core.llm import DEFAULT_MODEL
 
 
 def run_interactive_test_step(
     user_text: str,
     root: str = ".",
-    model: str = "gpt-4.1-mini",
+    model: str = DEFAULT_MODEL,
     session_id: str = "cli",
 ) -> Dict[str, Any]:
     """
-    Run one StableMind interactive test step and return structured output.
+    Run one MindForm interactive test step and return structured output.
     """
     cleaned_text = (user_text or "").strip()
     if not cleaned_text:
@@ -44,9 +45,9 @@ def run_interactive_test_step(
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Interactive StableMind test CLI")
+    parser = argparse.ArgumentParser(description="Interactive MindForm test CLI")
     parser.add_argument("--root", type=str, default=".", help="Project root directory")
-    parser.add_argument("--model", type=str, default="gpt-4.1-mini", help="OpenAI model name")
+    parser.add_argument("--model", type=str, default=DEFAULT_MODEL, help="Gemma model name")
     parser.add_argument("--session", type=str, default="cli", help="Session id")
     parser.add_argument("--show-beliefs", action="store_true", help="Print beliefs each turn")
     parser.add_argument("--pretty", action="store_true", help="Pretty-print JSON")
@@ -56,7 +57,7 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
 
-    print("StableMind interactive test")
+    print("MindForm interactive test")
     print("Type a message and press Enter.")
     print("Commands: /exit, /quit, /help")
     print("Stop anytime: Ctrl+C\n")

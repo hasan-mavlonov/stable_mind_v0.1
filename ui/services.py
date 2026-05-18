@@ -1,6 +1,7 @@
 from pathlib import Path
 import json
 
+from core.llm import DEFAULT_MODEL
 from create_persona import create_persona
 from talk import answer_user_message
 from interactive_test import run_interactive_test_step
@@ -78,6 +79,6 @@ def run_interactive_test(user_text: str) -> dict:
     return run_interactive_test_step(
         user_text=user_text,
         root=str(project_root),
-        model="gpt-4.1-mini",
+        model=DEFAULT_MODEL,
         session_id="web",
     )

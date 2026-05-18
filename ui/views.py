@@ -54,7 +54,11 @@ def _log_interaction(request, user_input: str, agent_output: str, default_phase:
     )
 
 
-def home(request):
+def landing(request):
+    return render(request, "ui/landing.html")
+
+
+def console(request):
     return render(request, "ui/home.html")
 
 
