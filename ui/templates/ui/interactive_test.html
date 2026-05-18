@@ -3,63 +3,69 @@
 {% block title %}Interactive Test · MindForm Console{% endblock %}
 
 {% block content %}
-<section class="space-y-6">
-    <div class="rounded-2xl border border-slate-800 bg-slate-900 p-8">
-        <h1 class="text-2xl font-bold">Interactive Test</h1>
-        <p class="mt-2 text-slate-300">Run one MindForm engine step and inspect internal state output.</p>
+<section class="stack">
+    <div>
+        <p class="eyebrow">Single step</p>
+        <h1 class="page-h">Interactive Test</h1>
+        <p class="lead">Run one MindForm engine step and inspect the internal state it produces.</p>
+    </div>
 
+    <div class="panel stack">
         {% if active_evaluation_session %}
-            <div class="mt-3 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm text-emerald-300">Logging to active session: {{ active_evaluation_session.participant_id }} ({{ active_evaluation_session.condition }})</div>
+            <div class="note note-info">Logging to active session: {{ active_evaluation_session.participant_id }} ({{ active_evaluation_session.condition }})</div>
         {% endif %}
 
-        <form method="post" class="mt-6 space-y-3">
+        <form method="post" class="stack">
             {% csrf_token %}
             {% if active_evaluation_session %}
-                <div>
-                    <label class="mb-1 block text-sm text-slate-300">Evaluation phase</label>
-                    <select name="evaluation_phase" class="w-full rounded-lg border border-slate-700 bg-slate-950 p-2">
+                <div class="field">
+                    <label>Evaluation phase</label>
+                    <select name="evaluation_phase">
                         {% for phase in evaluation_phases %}
                             <option value="{{ phase }}" {% if selected_phase == phase %}selected{% endif %}>{{ phase }}</option>
                         {% endfor %}
                     </select>
                 </div>
             {% endif %}
-            <textarea class="min-h-36 w-full rounded-lg border border-slate-700 bg-slate-950 p-3" name="message" placeholder="Type a test input...">{% if user_text %}{{ user_text }}{% endif %}</textarea>
-            <button class="rounded-lg bg-cyan-500 px-4 py-2 font-semibold text-slate-950 hover:bg-cyan-400" type="submit">Run Test Step</button>
+            <div class="field">
+                <label>Test input</label>
+                <textarea name="message" placeholder="Type a test input…">{% if user_text %}{{ user_text }}{% endif %}</textarea>
+            </div>
+            <button class="btn btn-primary" type="submit">Run test step</button>
         </form>
 
         {% if error %}
-            <div class="mt-4 rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-rose-300">{{ error }}</div>
+            <div class="note note-err">{{ error }}</div>
         {% endif %}
     </div>
 
     {% if result %}
-        <div class="grid gap-4 md:grid-cols-2">
-            <div class="rounded-xl border border-slate-800 bg-slate-900 p-4"><strong>Turn:</strong> {{ result.turn }}</div>
-            <div class="rounded-xl border border-slate-800 bg-slate-900 p-4"><strong>Input:</strong> {{ result.input }}</div>
-            <div class="rounded-xl border border-slate-800 bg-slate-900 p-4"><strong>Buffer Size:</strong> {{ result.buffer_size }}</div>
-            <div class="rounded-xl border border-slate-800 bg-slate-900 p-4"><strong>Did Ruminate:</strong> {{ result.did_ruminate }}</div>
+        <div class="grid grid-2">
+            <div class="kv"><b>Turn</b> {{ result.turn }}</div>
+            <div class="kv"><b>Input</b> {{ result.input }}</div>
+            <div class="kv"><b>Buffer size</b> {{ result.buffer_size }}</div>
+            <div class="kv"><b>Did ruminate</b> {{ result.did_ruminate }}</div>
         </div>
 
-        <div class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-            <h2 class="text-xl font-semibold">Perceived Entities</h2>
+        <div class="panel">
+            <h2 class="panel-h">Perceived entities</h2>
             {% if result.perceived_entities %}
-                <ul class="mt-3 space-y-2">
+                <div class="stack" style="margin-top:14px;">
                     {% for item in result.perceived_entities %}
-                        <li class="rounded-lg border border-slate-700 bg-slate-950 p-3"><pre class="whitespace-pre-wrap">{{ item }}</pre></li>
+                        <pre>{{ item }}</pre>
                     {% endfor %}
-                </ul>
+                </div>
             {% else %}
-                <p class="mt-2 text-slate-300">No perceived entities.</p>
+                <p class="muted" style="margin-top:8px;">No perceived entities.</p>
             {% endif %}
         </div>
 
-        <div class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-            <h2 class="text-xl font-semibold">Beliefs</h2>
+        <div class="panel">
+            <h2 class="panel-h">Beliefs</h2>
             {% if result.beliefs %}
-                <pre class="mt-3 overflow-x-auto rounded-lg border border-slate-700 bg-slate-950 p-3">{{ result.beliefs }}</pre>
+                <pre style="margin-top:14px;">{{ result.beliefs }}</pre>
             {% else %}
-                <p class="mt-2 text-slate-300">No beliefs returned for this step.</p>
+                <p class="muted" style="margin-top:8px;">No beliefs returned for this step.</p>
             {% endif %}
         </div>
     {% endif %}

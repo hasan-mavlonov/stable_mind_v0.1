@@ -3,35 +3,35 @@
 {% block title %}MindForm Console{% endblock %}
 
 {% block content %}
-<section class="rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900 to-slate-950 p-8 shadow-xl shadow-rose-950/20">
-    <p class="text-xs uppercase tracking-[0.22em] text-rose-400">Personality engine · live console</p>
-    <h1 class="mt-3 text-4xl font-bold tracking-tight">MindForm Console</h1>
-    <p class="mt-4 max-w-2xl text-slate-300">Initialize a persona, talk to an agent, run single engine steps, and inspect the belief / trait / memory state in real time. Perception and language run on <span class="font-semibold text-rose-300">Gemma</span> via Google AI Studio.</p>
+<section>
+    <p class="eyebrow">Personality engine · live console</p>
+    <h1 class="page-h">MindForm Console</h1>
+    <p class="lead">Initialize a persona, talk to an agent, run single engine steps, and inspect the belief, trait, and memory state in real time. Perception and language run on <em>Gemma</em> via Google AI Studio.</p>
 
-    <div class="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        <a href="{% url 'create_persona' %}" class="group rounded-xl border border-slate-700 bg-slate-800/60 p-5 transition hover:border-rose-400 hover:bg-slate-800">
-            <h2 class="font-semibold text-slate-100">Create Persona</h2>
-            <p class="mt-1 text-sm text-slate-400">Reset and initialize persona + memory files.</p>
+    <div class="grid grid-3" style="margin-top:40px;">
+        <a href="{% url 'create_persona' %}" class="tile">
+            <h2>Create Persona</h2>
+            <p>Reset and initialize persona + memory files.</p>
         </a>
-        <a href="{% url 'talk' %}" class="group rounded-xl border border-slate-700 bg-slate-800/60 p-5 transition hover:border-rose-400 hover:bg-slate-800">
-            <h2 class="font-semibold text-slate-100">Talk</h2>
-            <p class="mt-1 text-sm text-slate-400">Send direct prompts and get an in-character response.</p>
+        <a href="{% url 'talk' %}" class="tile">
+            <h2>Talk</h2>
+            <p>Send direct prompts and get an in-character response.</p>
         </a>
-        <a href="{% url 'interactive_test' %}" class="group rounded-xl border border-slate-700 bg-slate-800/60 p-5 transition hover:border-rose-400 hover:bg-slate-800">
-            <h2 class="font-semibold text-slate-100">Interactive Test</h2>
-            <p class="mt-1 text-sm text-slate-400">Run a single engine step and inspect internals.</p>
+        <a href="{% url 'interactive_test' %}" class="tile">
+            <h2>Interactive Test</h2>
+            <p>Run a single engine step and inspect internals.</p>
         </a>
-        <a href="{% url 'persona' %}" class="group rounded-xl border border-slate-700 bg-slate-800/60 p-5 transition hover:border-rose-400 hover:bg-slate-800">
-            <h2 class="font-semibold text-slate-100">Persona Viewer</h2>
-            <p class="mt-1 text-sm text-slate-400">Explore immutable, stable, and dynamic persona data.</p>
+        <a href="{% url 'persona' %}" class="tile">
+            <h2>Persona Viewer</h2>
+            <p>Explore immutable, stable, and dynamic persona data.</p>
         </a>
-        <a href="{% url 'memory' %}" class="group rounded-xl border border-slate-700 bg-slate-800/60 p-5 transition hover:border-rose-400 hover:bg-slate-800">
-            <h2 class="font-semibold text-slate-100">Memory Viewer</h2>
-            <p class="mt-1 text-sm text-slate-400">Inspect JSONL logs for perceptions and reflection.</p>
+        <a href="{% url 'memory' %}" class="tile">
+            <h2>Memory Viewer</h2>
+            <p>Inspect JSONL logs for perceptions and reflection.</p>
         </a>
-        <a href="{% url 'evaluation_session' %}" class="group rounded-xl border border-slate-700 bg-slate-800/60 p-5 transition hover:border-rose-400 hover:bg-slate-800">
-            <h2 class="font-semibold text-slate-100">Evaluation Session</h2>
-            <p class="mt-1 text-sm text-slate-400">Start and manage human-evaluation session logging.</p>
+        <a href="{% url 'evaluation_session' %}" class="tile">
+            <h2>Evaluation Session</h2>
+            <p>Start and manage human-evaluation session logging.</p>
         </a>
     </div>
 </section>

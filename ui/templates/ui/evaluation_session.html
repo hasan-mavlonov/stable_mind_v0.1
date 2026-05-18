@@ -1,69 +1,78 @@
 {% extends "ui/base.html" %}
 
+{% block title %}Evaluation · MindForm Console{% endblock %}
+
 {% block content %}
-<section class="grid gap-6 lg:grid-cols-2">
-    <div class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-        <h1 class="text-2xl font-bold">Evaluation Session</h1>
-        <p class="mt-2 text-slate-300">Start a participant session and keep it active while using Talk or Interactive Test.</p>
-
-        {% if active_session %}
-            <div class="mt-4 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-emerald-300">
-                Active: {{ active_session.participant_id }} ({{ active_session.condition }})
-            </div>
-            <form method="post" class="mt-4">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="end">
-                <button type="submit" class="rounded-lg bg-rose-500 px-4 py-2 font-semibold text-slate-950 hover:bg-rose-400">End Session</button>
-            </form>
-        {% else %}
-            <form method="post" class="mt-4 space-y-3">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="start">
-                <input required name="participant_id" placeholder="Participant ID" class="w-full rounded-lg border border-slate-700 bg-slate-950 p-2">
-                <input required name="condition" placeholder="Condition (mindform/baseline)" class="w-full rounded-lg border border-slate-700 bg-slate-950 p-2">
-                <input name="session_order" placeholder="Session order (optional)" class="w-full rounded-lg border border-slate-700 bg-slate-950 p-2">
-                <textarea name="notes" placeholder="Notes (optional)" class="w-full rounded-lg border border-slate-700 bg-slate-950 p-2"></textarea>
-                <button type="submit" class="rounded-lg bg-cyan-500 px-4 py-2 font-semibold text-slate-950 hover:bg-cyan-400">Start Session</button>
-            </form>
-        {% endif %}
+<section class="stack">
+    <div>
+        <p class="eyebrow">Human evaluation</p>
+        <h1 class="page-h">Evaluation Session</h1>
+        <p class="lead">Start a participant session and keep it active while using Talk or Interactive Test.</p>
     </div>
 
-    <div class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-        <h2 class="text-xl font-semibold">Block Rating</h2>
-        <form method="post" action="/evaluation/rating/" class="mt-4 space-y-3">
-            {% csrf_token %}
-            <select name="phase" class="w-full rounded-lg border border-slate-700 bg-slate-950 p-2">
-                {% for phase in evaluation_phases %}<option value="{{ phase }}">{{ phase }}</option>{% endfor %}
-            </select>
-            <input required type="number" min="1" max="7" name="consistency_score" placeholder="Consistency (1-7)" class="w-full rounded-lg border border-slate-700 bg-slate-950 p-2">
-            <input required type="number" min="1" max="7" name="adaptation_score" placeholder="Adaptation (1-7)" class="w-full rounded-lg border border-slate-700 bg-slate-950 p-2">
-            <input required type="number" min="1" max="7" name="stability_score" placeholder="Stability (1-7)" class="w-full rounded-lg border border-slate-700 bg-slate-950 p-2">
-            <input required type="number" min="1" max="7" name="believability_score" placeholder="Believability (1-7)" class="w-full rounded-lg border border-slate-700 bg-slate-950 p-2">
-            <textarea name="comment" placeholder="Optional comment" class="w-full rounded-lg border border-slate-700 bg-slate-950 p-2"></textarea>
-            <button type="submit" class="rounded-lg bg-cyan-500 px-4 py-2 font-semibold text-slate-950 hover:bg-cyan-400">Save Block Rating</button>
-        </form>
+    <div class="grid grid-2">
+        <div class="panel">
+            <h2 class="panel-h">Session</h2>
+            {% if active_session %}
+                <div class="note note-ok" style="margin-top:14px;">Active: {{ active_session.participant_id }} ({{ active_session.condition }})</div>
+                <form method="post" style="margin-top:18px;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="end">
+                    <button type="submit" class="btn btn-danger">End session</button>
+                </form>
+            {% else %}
+                <form method="post" class="stack" style="margin-top:14px;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="start">
+                    <div class="field"><label>Participant ID</label><input required name="participant_id" placeholder="Participant ID"></div>
+                    <div class="field"><label>Condition</label><input required name="condition" placeholder="mindform / baseline"></div>
+                    <div class="field"><label>Session order (optional)</label><input name="session_order" placeholder="Session order"></div>
+                    <div class="field"><label>Notes (optional)</label><textarea name="notes" placeholder="Notes"></textarea></div>
+                    <button type="submit" class="btn btn-primary">Start session</button>
+                </form>
+            {% endif %}
+        </div>
 
-        <h2 class="mt-8 text-xl font-semibold">Final Preference</h2>
-        <form method="post" action="/evaluation/final-preference/" class="mt-4 space-y-3">
-            {% csrf_token %}
-            <input required name="preferred_system" placeholder="Preferred system" class="w-full rounded-lg border border-slate-700 bg-slate-950 p-2">
-            <textarea name="comment" placeholder="Optional final comment" class="w-full rounded-lg border border-slate-700 bg-slate-950 p-2"></textarea>
-            <button type="submit" class="rounded-lg bg-cyan-500 px-4 py-2 font-semibold text-slate-950 hover:bg-cyan-400">Save Final Preference</button>
-        </form>
+        <div class="panel">
+            <h2 class="panel-h">Block rating</h2>
+            <form method="post" action="{% url 'block_rating' %}" class="stack" style="margin-top:14px;">
+                {% csrf_token %}
+                <div class="field">
+                    <label>Phase</label>
+                    <select name="phase">
+                        {% for phase in evaluation_phases %}<option value="{{ phase }}">{{ phase }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="field"><label>Consistency (1–7)</label><input required type="number" min="1" max="7" name="consistency_score"></div>
+                <div class="field"><label>Adaptation (1–7)</label><input required type="number" min="1" max="7" name="adaptation_score"></div>
+                <div class="field"><label>Stability (1–7)</label><input required type="number" min="1" max="7" name="stability_score"></div>
+                <div class="field"><label>Believability (1–7)</label><input required type="number" min="1" max="7" name="believability_score"></div>
+                <div class="field"><label>Comment (optional)</label><textarea name="comment" placeholder="Optional comment"></textarea></div>
+                <button type="submit" class="btn btn-primary">Save block rating</button>
+            </form>
+
+            <h2 class="panel-h" style="margin-top:32px;">Final preference</h2>
+            <form method="post" action="{% url 'final_preference' %}" class="stack" style="margin-top:14px;">
+                {% csrf_token %}
+                <div class="field"><label>Preferred system</label><input required name="preferred_system" placeholder="Preferred system"></div>
+                <div class="field"><label>Comment (optional)</label><textarea name="comment" placeholder="Optional final comment"></textarea></div>
+                <button type="submit" class="btn btn-primary">Save final preference</button>
+            </form>
+        </div>
     </div>
-</section>
 
-<section class="mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6">
-    <h2 class="text-xl font-semibold">Recent Sessions</h2>
-    <ul class="mt-4 space-y-2">
-        {% for session in sessions %}
-            <li class="rounded-lg border border-slate-700 bg-slate-950 p-3">
-                <a class="text-cyan-300 hover:underline" href="/evaluation/{{ session.id }}/">{{ session.participant_id }} - {{ session.condition }}</a>
-                <span class="ml-2 text-sm text-slate-400">Start: {{ session.started_at }}{% if session.ended_at %} / End: {{ session.ended_at }}{% endif %}</span>
-            </li>
-        {% empty %}
-            <li class="text-slate-300">No sessions yet.</li>
-        {% endfor %}
-    </ul>
+    <div class="panel">
+        <h2 class="panel-h">Recent sessions</h2>
+        <ul class="list" style="margin-top:14px;">
+            {% for session in sessions %}
+                <li class="row-item">
+                    <a class="meta" href="{% url 'evaluation_session_detail' session.id %}">{{ session.participant_id }} — {{ session.condition }}</a>
+                    <span class="muted" style="margin-left:10px;font-size:14px;">Start: {{ session.started_at }}{% if session.ended_at %} · End: {{ session.ended_at }}{% endif %}</span>
+                </li>
+            {% empty %}
+                <li class="muted">No sessions yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
 </section>
 {% endblock %}

@@ -1,44 +1,186 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-slate-950">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}MindForm Console{% endblock %}</title>
-    <meta name="description" content="MindForm Console — run the personality engine: create personas, talk to agents, inspect beliefs, traits, and memory.">
+    <meta name="description" content="MindForm Console — run the personality engine: create personas, talk to agents, and inspect beliefs, traits, and memory.">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231A0E2E'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23F0386B'/%3E%3C/svg%3E">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('theme');
+          if (t !== 'dark' && t !== 'light') {
+            t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          }
+          document.documentElement.setAttribute('data-theme', t);
+        } catch (e) { document.documentElement.setAttribute('data-theme', 'dark'); }
+      })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+    :root {
+      --bone: #FAF7F1; --bone-2: #F2EDE3;
+      --ink: #1A0E2E; --ink-2: #2E1F4A;
+      --muted: #6A597F;
+      --hairline: rgba(26,14,46,0.12);
+      --belief: #F0386B; --belief-soft: #FF6F94;
+      --trait: #5B3FE0;
+      --surface: #ffffff;
+      --code-bg: #1A0E2E; --code-fg: #F2EAD6;
+      --ok: #1f9d6b; --ok-bg: rgba(31,157,107,0.10);
+      --err: #d33b5e; --err-bg: rgba(211,59,94,0.10);
+      --serif: "Instrument Serif", Georgia, serif;
+      --body: "Newsreader", Georgia, serif;
+      --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+      color-scheme: light;
+    }
+    [data-theme="dark"] {
+      --bone: #0E0820; --bone-2: #161029;
+      --ink: #F2EAD6; --ink-2: #C9C0AA;
+      --muted: #B5A8C7;
+      --hairline: rgba(242,234,214,0.14);
+      --belief: #FF6F94; --belief-soft: #FF6F94;
+      --trait: #9A7FFF;
+      --surface: #16102B;
+      --code-bg: #06010E; --code-fg: #F2EAD6;
+      --ok: #4fd3a0; --ok-bg: rgba(79,211,160,0.10);
+      --err: #ff8aa3; --err-bg: rgba(255,138,163,0.12);
+      color-scheme: dark;
+    }
+    * { box-sizing: border-box; }
+    html { transition: background-color .25s ease, color .25s ease; }
+    body { margin: 0; background: var(--bone); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+    a { color: inherit; text-decoration: none; }
+    ::selection { background: var(--ink); color: var(--bone); }
+    h1, h2, h3 { font-family: var(--serif); font-weight: 400; letter-spacing: -0.015em; line-height: 1.02; margin: 0; }
+    p { margin: 0; }
+
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 0 28px; }
+    .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--belief); }
+    .page-h { font-size: clamp(32px, 4.5vw, 52px); margin: 14px 0 10px; }
+    .lead { color: var(--ink-2); font-size: 18px; max-width: 640px; }
+
+    /* Header */
+    .site-head { position: sticky; top: 0; z-index: 50; background: color-mix(in srgb, var(--bone) 92%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--hairline); }
+    .site-head-in { max-width: 1100px; margin: 0 auto; padding: 16px 28px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; font-family: var(--serif); font-size: 24px; }
+    .brand .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--belief); box-shadow: 0 0 10px var(--belief); animation: pulse 2.4s ease-in-out infinite; }
+    .brand .chip { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--hairline); border-radius: 999px; padding: 3px 9px; }
+    @keyframes pulse { 0%,100% { opacity:.55; } 50% { opacity:1; } }
+    .nav { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; }
+    .nav a { padding: 7px 12px; border-radius: 999px; color: var(--muted); transition: color .15s, background .15s; }
+    .nav a:hover { color: var(--ink); }
+    .nav a.is-active { color: var(--ink); background: color-mix(in srgb, var(--belief) 14%, transparent); }
+    .theme-toggle { width: 36px; height: 36px; border-radius: 999px; border: 1px solid var(--hairline); background: transparent; color: var(--ink); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; position: relative; flex-shrink: 0; }
+    .theme-toggle:hover { border-color: var(--ink); }
+    .theme-toggle svg { position: absolute; width: 16px; height: 16px; transition: opacity .25s, transform .3s; }
+    [data-theme="light"] .ti-moon { opacity: 1; transform: rotate(0); }
+    [data-theme="light"] .ti-sun  { opacity: 0; transform: rotate(90deg) scale(.6); }
+    [data-theme="dark"]  .ti-moon { opacity: 0; transform: rotate(-90deg) scale(.6); }
+    [data-theme="dark"]  .ti-sun  { opacity: 1; transform: rotate(0); }
+
+    main { padding: 56px 0 40px; }
+    .stack > * + * { margin-top: 24px; }
+
+    /* Panels */
+    .panel { background: var(--surface); border: 1px solid var(--hairline); border-radius: 14px; padding: 28px; }
+    .panel-h { font-family: var(--serif); font-size: 24px; margin-bottom: 6px; }
+    .panel-sub { color: var(--muted); font-size: 15px; margin-bottom: 18px; }
+
+    .grid { display: grid; gap: 16px; }
+    @media (min-width: 640px) { .grid-2 { grid-template-columns: 1fr 1fr; } .grid-3 { grid-template-columns: repeat(3,1fr); } }
+
+    /* Tiles */
+    .tile { display: block; background: var(--surface); border: 1px solid var(--hairline); border-radius: 14px; padding: 22px; transition: border-color .18s, transform .18s; }
+    .tile:hover { border-color: var(--belief); transform: translateY(-2px); }
+    .tile h2 { font-family: var(--serif); font-size: 21px; margin: 0 0 6px; }
+    .tile p { color: var(--muted); font-size: 14px; }
+
+    /* Buttons */
+    .btn { display: inline-flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; padding: 12px 22px; border-radius: 999px; border: 1px solid var(--ink); background: transparent; color: var(--ink); cursor: pointer; transition: background .18s, color .18s, border-color .18s; }
+    .btn:hover { background: var(--ink); color: var(--bone); }
+    .btn-primary { background: var(--belief); border-color: var(--belief); color: #fff; }
+    .btn-primary:hover { background: var(--belief-soft); border-color: var(--belief-soft); color: #fff; }
+    .btn-danger { background: transparent; border-color: var(--err); color: var(--err); }
+    .btn-danger:hover { background: var(--err); color: #fff; }
+
+    /* Forms */
+    label { display: block; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; }
+    input, textarea, select { width: 100%; font-family: var(--body); font-size: 16px; color: var(--ink); background: var(--bone-2); border: 1px solid var(--hairline); border-radius: 10px; padding: 12px 14px; outline: none; transition: border-color .15s; }
+    input:focus, textarea:focus, select:focus { border-color: var(--belief); }
+    textarea { min-height: 140px; resize: vertical; line-height: 1.5; }
+    .field + .field { margin-top: 16px; }
+
+    /* Notes */
+    .note { border-radius: 10px; padding: 13px 16px; font-size: 15px; }
+    .note-ok { background: var(--ok-bg); border: 1px solid color-mix(in srgb, var(--ok) 45%, transparent); color: var(--ok); }
+    .note-err { background: var(--err-bg); border: 1px solid color-mix(in srgb, var(--err) 45%, transparent); color: var(--err); }
+    .note-info { background: var(--ok-bg); border: 1px solid color-mix(in srgb, var(--ok) 35%, transparent); color: var(--ok); }
+
+    /* Code / data */
+    pre { font-family: var(--mono); font-size: 13px; line-height: 1.55; background: var(--code-bg); color: var(--code-fg); border-radius: 10px; padding: 16px; overflow-x: auto; margin: 0; }
+    .bubble { border: 1px solid var(--hairline); border-radius: 12px; padding: 18px 20px; background: var(--bone-2); }
+    .bubble-h { font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--belief); margin-bottom: 8px; }
+    .bubble p { white-space: pre-wrap; }
+    .kv { display: flex; gap: 10px; border: 1px solid var(--hairline); border-radius: 10px; padding: 14px 16px; background: var(--bone-2); font-size: 15px; }
+    .kv b { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+    .row-item { border: 1px solid var(--hairline); border-radius: 10px; padding: 14px 16px; background: var(--bone-2); }
+    .row-item + .row-item { margin-top: 10px; }
+    .meta { font-family: var(--mono); font-size: 12px; color: var(--belief); letter-spacing: 0.06em; }
+    .muted { color: var(--muted); }
+    .list { list-style: none; margin: 0; padding: 0; }
+
+    /* Footer */
+    .site-foot { border-top: 1px solid var(--hairline); margin-top: 40px; }
+    .site-foot .wrap { padding-top: 26px; padding-bottom: 40px; }
+    .site-foot p { font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+    </style>
 </head>
-<body class="h-full bg-slate-950 text-slate-100">
-    <div class="min-h-full">
-        <header class="sticky top-0 z-30 border-b border-slate-800 bg-slate-950/95 backdrop-blur">
-            <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
-                <a href="{% url 'landing' %}" class="flex items-center gap-2 text-lg font-semibold tracking-tight">
-                    <span class="inline-block h-2.5 w-2.5 rounded-full bg-rose-500 shadow-[0_0_10px_#F0386B]"></span>
-                    <span class="text-slate-100">MindForm</span>
-                    <span class="ml-1 rounded-md border border-slate-700 px-2 py-0.5 text-[10px] uppercase tracking-[0.18em] text-slate-400">Console</span>
-                </a>
-                <nav class="flex flex-wrap items-center gap-1 text-sm">
-                    <a class="rounded-md px-3 py-1.5 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'landing' %}">← Site</a>
-                    <a class="rounded-md px-3 py-1.5 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'console' %}">Console</a>
-                    <a class="rounded-md px-3 py-1.5 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'create_persona' %}">Create Persona</a>
-                    <a class="rounded-md px-3 py-1.5 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'talk' %}">Talk</a>
-                    <a class="rounded-md px-3 py-1.5 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'interactive_test' %}">Interactive Test</a>
-                    <a class="rounded-md px-3 py-1.5 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'persona' %}">Persona</a>
-                    <a class="rounded-md px-3 py-1.5 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'memory' %}">Memory</a>
-                    <a class="rounded-md px-3 py-1.5 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'evaluation_session' %}">Evaluation</a>
-                </nav>
-            </div>
-        </header>
+<body>
+    <header class="site-head">
+        <div class="site-head-in">
+            <a href="{% url 'landing' %}" class="brand">
+                <span class="dot"></span><span>MindForm</span><span class="chip">Console</span>
+            </a>
+            <nav class="nav">
+                <a href="{% url 'landing' %}">← Site</a>
+                <a href="{% url 'console' %}" class="{% if request.resolver_match.url_name == 'console' %}is-active{% endif %}">Console</a>
+                <a href="{% url 'create_persona' %}" class="{% if request.resolver_match.url_name == 'create_persona' %}is-active{% endif %}">Persona+</a>
+                <a href="{% url 'talk' %}" class="{% if request.resolver_match.url_name == 'talk' %}is-active{% endif %}">Talk</a>
+                <a href="{% url 'interactive_test' %}" class="{% if request.resolver_match.url_name == 'interactive_test' %}is-active{% endif %}">Test</a>
+                <a href="{% url 'persona' %}" class="{% if request.resolver_match.url_name == 'persona' %}is-active{% endif %}">Persona</a>
+                <a href="{% url 'memory' %}" class="{% if request.resolver_match.url_name == 'memory' %}is-active{% endif %}">Memory</a>
+                <a href="{% url 'evaluation_session' %}" class="{% if 'evaluation' in request.resolver_match.url_name %}is-active{% endif %}">Eval</a>
+                <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                    <svg class="ti-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+                    <svg class="ti-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"></path></svg>
+                </button>
+            </nav>
+        </div>
+    </header>
 
-        <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <main>
+        <div class="wrap">
             {% block content %}{% endblock %}
-        </main>
+        </div>
+    </main>
 
-        <footer class="mx-auto max-w-7xl px-4 pb-10 pt-6 sm:px-6 lg:px-8">
-            <p class="border-t border-slate-800 pt-6 text-xs uppercase tracking-[0.16em] text-slate-500">
-                MindForm · The personality layer for AI agents · Powered by Gemma
-            </p>
-        </footer>
-    </div>
+    <footer class="site-foot">
+        <div class="wrap">
+            <p>MindForm · The personality layer for AI agents · Powered by Gemma</p>
+        </div>
+    </footer>
+
+    <script>
+      document.getElementById('theme-toggle').addEventListener('click', function () {
+        var cur = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+        var next = cur === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        try { localStorage.setItem('theme', next); } catch (e) {}
+      });
+    </script>
 </body>
 </html>
