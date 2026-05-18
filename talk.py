@@ -23,7 +23,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 import os
-
+import json
 from dotenv import load_dotenv
 
 from core.llm import DEFAULT_MODEL, generate_text
