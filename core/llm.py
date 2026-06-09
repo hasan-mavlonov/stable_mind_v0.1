@@ -39,7 +39,7 @@ load_dotenv()
 # gemini-2.5-flash-lite is Google's lowest-latency text model. It is the
 # fastest sensible default for MindForm's short extraction / rephrasing
 # calls; heavier models (gemini-2.5-pro) add several seconds per turn.
-DEFAULT_MODEL = os.getenv("MINDFORM_MODEL", "gemini-2.5-flash-lite")
+DEFAULT_MODEL = os.getenv("MINDFORM_MODEL", "gemma-4-31b-it")
 
 _API_KEY_VARS = (
     "GEMMA_API_KEY",
